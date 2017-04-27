@@ -7,6 +7,6 @@ If you just want to solve Rubik's cube and play around with its patterns [Cube E
 ## Usage
 There are several tables which must be created on the first run. These need about 80 MB disk space and it takes from about 1 to 12 hours to create them, depending on the hardware. Usually you start the cubesolving server which listens on a port of your choice and which accepts the cube definition string and returns the solving maneuver. The module example.py gives detailed examples how to start the server and a simple GUI-interface which interacts with the server. You can run the example file with
 
-python example.py or eventually python3 example.py
+"python example.py" or eventually "python3 example.py"
 
 Make sure that you use Python 3. 
