@@ -244,7 +244,7 @@ class CubieCube:
     def get_slice(self):
         """Location of the UD-slice edges FR,FL,BL and BR ignoring their permutation."""
         a = x = 0
-        # First compute the index a < (12 choose 4) and the permutation array perm.
+        # Compute the index a < (12 choose 4)
         for j in range(Ed.BR, Ed.UR - 1, -1):
             if Ed.FR <= self.ep[j] <= Ed.BR:
                 a += c_nk(11 - j, x + 1)
