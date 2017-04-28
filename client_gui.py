@@ -159,7 +159,7 @@ def click(event):
 
 #  ###################################### Generate and display the TK_widgets ##########################################
 root = Tk()
-
+root.wm_title("Solver Client")
 canvas = Canvas(root, width=12 * width + 20, height=9 * width + 20)
 canvas.pack()
 
