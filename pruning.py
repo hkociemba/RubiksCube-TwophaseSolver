@@ -85,7 +85,7 @@ def create_phase1_prun_table():
         depth = 0
         backsearch = False
         print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-        print(time.clock())
+        #print(time.clock())
         while done != total:
             depth3 = depth % 3
             if depth == 9:
@@ -208,7 +208,7 @@ def create_phase2_prun_table():
         depth = 0
         backsearch = False
         print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-        print(time.clock())
+        #print(time.clock())
         while done != total:
             depth3 = depth % 3
             if depth == 13:

@@ -1,6 +1,5 @@
 # ############################ Examples how to use the cube solver #####################################################
 
-
 cubestring = 'DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL'  # cube definition string of cube we want to solve
 # See module enums.py for the format of the cube definition string
 
