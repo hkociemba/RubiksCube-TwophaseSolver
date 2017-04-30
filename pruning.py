@@ -35,20 +35,14 @@ def get_corners_ud_edges_depth3(ix):
 def set_flipslice_twist_depth3(ix, value):
     shift = (ix % 16) * 2
     base = ix >> 4
-    if shift == 30:  # extra handling needed
-        flipslice_twist_depth3[base] &= 0x3fffffff  # binary 0011 1111 1111 1111 1111 1111 1111 1111
-    else:
-        flipslice_twist_depth3[base] &= ~(3 << shift)
+    flipslice_twist_depth3[base] &= ~(3 << shift) & 0xffffffff
     flipslice_twist_depth3[base] |= value << shift
 
 
 def set_corners_ud_edges_depth3(ix, value):
     shift = (ix % 16) * 2
     base = ix >> 4
-    if shift == 30:  # extra handling needed
-        corners_ud_edges_depth3[base] &= 0x3fffffff  # binary 0011 1111 1111 1111 1111 1111 1111 1111
-    else:
-        corners_ud_edges_depth3[base] &= ~(3 << shift)
+    corners_ud_edges_depth3[base] &= ~(3 << shift) & 0xffffffff
     corners_ud_edges_depth3[base] |= value << shift
 
 ########################################################################################################################
@@ -342,16 +336,6 @@ def create_phase2_cornsliceprun_table():
 
 # array distance computes the new distance from the old_distance i and the new_distance_mod3 j. ########################
 # We need this array because the pruning tables only store the distances mod 3. ########################################
-distance = [[0] * 3 for i in range(20)]
-for i in range(20):
-    for j in range(3):
-        distance[i][j] = (i // 3) * 3 + j
-        if i % 3 == 2 and j == 0:
-            distance[i][j] += 3
-        elif i % 3 == 0 and j == 2:
-            distance[i][j] -= 3
-
-# die Alternativen später testen!!
 distance = ar.array('b', [0 for i in range(60)])
 for i in range(20):
     for j in range(3):
