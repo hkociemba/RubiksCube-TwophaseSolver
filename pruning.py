@@ -35,31 +35,21 @@ def get_corners_ud_edges_depth3(ix):
 def set_flipslice_twist_depth3(ix, value):
     shift = (ix % 16) * 2
     base = ix >> 4
-    if shift == 30:  # issues with conversion to C long
+    if shift == 30:  # extra handling needed
         flipslice_twist_depth3[base] &= 0x3fffffff  # binary 0011 1111 1111 1111 1111 1111 1111 1111
-        if value == 1:
-            flipslice_twist_depth3[base] |= 0x40000000  # binary 0100 0000 0000 0000 0000 0000 0000 0000
-        elif value == 2:
-            flipslice_twist_depth3[base] |= -2147483648  # binary 1000 0000 0000 0000 0000 0000 0000 0000
-            # we may not write 0x80000000 because Python extends this to a >32 bit positive integer
     else:
         flipslice_twist_depth3[base] &= ~(3 << shift)
-        flipslice_twist_depth3[base] |= value << shift
+    flipslice_twist_depth3[base] |= value << shift
 
 
 def set_corners_ud_edges_depth3(ix, value):
     shift = (ix % 16) * 2
     base = ix >> 4
-    if shift == 30:  # issues with conversion to C long
+    if shift == 30:  # extra handling needed
         corners_ud_edges_depth3[base] &= 0x3fffffff  # binary 0011 1111 1111 1111 1111 1111 1111 1111
-        if value == 1:
-            corners_ud_edges_depth3[base] |= 0x40000000  # binary 0100 0000 0000 0000 0000 0000 0000 0000
-        elif value == 2:
-            corners_ud_edges_depth3[base] |= -2147483648  # binary 1000 0000 0000 0000 0000 0000 0000 0000
-            # we may not write 0x80000000 because Python extends this to a >32 bit positive integer
     else:
         corners_ud_edges_depth3[base] &= ~(3 << shift)
-        corners_ud_edges_depth3[base] |= value << shift
+    corners_ud_edges_depth3[base] |= value << shift
 
 ########################################################################################################################
 
@@ -73,7 +63,7 @@ def create_phase1_prun_table():
         print("creating " + fname + " table...")
         print('This may take an hour or even longer, depending on the hardware.')
 
-        flipslice_twist_depth3 = ar.array('l', [-1] * (total // 16 + 1))
+        flipslice_twist_depth3 = ar.array('L', [0xffffffff] * (total // 16 + 1))
         # #################### create table with the symmetries of the flipslice classes ###############################
         cc = cb.CubieCube()
         fs_sym = ar.array('H', [0] * defs.N_FLIPSLICE_CLASS)
@@ -123,7 +113,7 @@ def create_phase1_prun_table():
                 while twist < defs.N_TWIST:
 
                     # ########## if table entries are not populated, this is very fast: ################################
-                    if not backsearch and idx % 16 == 0 and flipslice_twist_depth3[idx // 16] == -1 \
+                    if not backsearch and idx % 16 == 0 and flipslice_twist_depth3[idx // 16] == 0xffffffff \
                             and twist < defs.N_TWIST - 16:
                         twist += 16
                         idx += 16
@@ -177,14 +167,14 @@ def create_phase1_prun_table():
             depth += 1
             print()
             print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-            print(time.clock())
+            #print(time.clock())
 
         fh = open(fname, "wb")
         flipslice_twist_depth3.tofile(fh)
     else:
         print("loading " + fname + " table...")
         fh = open(fname, "rb")
-        flipslice_twist_depth3 = ar.array('l')
+        flipslice_twist_depth3 = ar.array('L')
         flipslice_twist_depth3.fromfile(fh, total // 16 + 1)
     fh.close()
 
@@ -198,7 +188,7 @@ def create_phase2_prun_table():
         print("creating " + fname + " table...")
         print('This may take an hour or even longer, depending on the hardware.')
 
-        corners_ud_edges_depth3 = ar.array('l', [-1] * (total // 16))
+        corners_ud_edges_depth3 = ar.array('L', [0xffffffff] * (total // 16))
         # ##################### create table with the symmetries of the corners classes ################################
         cc = cb.CubieCube()
         c_sym = ar.array('H', [0] * defs.N_CORNERS_CLASS)
@@ -245,7 +235,7 @@ def create_phase2_prun_table():
                 while ud_edge < defs.N_UD_EDGES:
 
                     # ################ if table entries are not populated, this is very fast: ##########################
-                    if not backsearch and idx % 16 == 0 and corners_ud_edges_depth3[idx // 16] == -1 \
+                    if not backsearch and idx % 16 == 0 and corners_ud_edges_depth3[idx // 16] == 0xffffffff \
                             and ud_edge < defs.N_UD_EDGES - 16:
                         ud_edge += 16
                         idx += 16
@@ -297,14 +287,14 @@ def create_phase2_prun_table():
             depth += 1
             print()
             print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-            print(time.clock())
+            #print(time.clock())
 
         fh = open(fname, "wb")
         corners_ud_edges_depth3.tofile(fh)
     else:
         print("loading " + fname + " table...")
         fh = open(fname, "rb")
-        corners_ud_edges_depth3 = ar.array('l')
+        corners_ud_edges_depth3 = ar.array('L')
         corners_ud_edges_depth3.fromfile(fh, total // 16)
 
     fh.close()
