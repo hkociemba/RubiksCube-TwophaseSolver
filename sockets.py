@@ -19,17 +19,18 @@ def client_thread(conn, maxlen, timeout):
                     print('Connection closed', flush=True)
                     return
             except:
-                print('Error while receiving data. Connection closed', flush=True)
+                #print('Error while receiving data. Connection closed', flush=True)
                 conn.close()
                 return
             for i in range(len(a)):
-                if a[i] in [ord('\n'), ord('\r'), ord('U'), ord('R'), ord('F'), ord('D'), ord('L'), ord('B'), ord('?')]:
+                if a[i] in [ord('\n'), ord('\r'), ord('H'), ord('T'), ord('P'),  ord('U'), ord('R'), ord('F'), ord('D'),
+                            ord('L'), ord('B'), ord('?')]:
                     data.append(a[i])
         if data[0] == ord('X'):
             break
         defstr = ''.join(chr(i) for i in data if chr(i) > chr(32))
         qpos = defstr.find('?')
-        if qpos >= 0:  # in this case we suppose the client is a webbrowser
+        if qpos >= 0 or defstr.find('HTTP') >= 0:  # in this case we suppose the client is a webbrowser
             defstr = defstr[qpos+1:qpos+55]
             reply = 'HTTP/1.1 200 OK' + '\n\n' + '<html><head><title>Answer from Cubesolver</title></head><body>' + '\n'
             reply += solver.solve(defstr, maxlen, timeout) + '\n' + '</body></html>' + '\n'
@@ -60,7 +61,7 @@ def server_start(args):
 
     while 1:
         conn, addr = s.accept()
-        print('Connected with ' + addr[0] + ':' + str(addr[1]) + ', ' + time.strftime("%Y.%m.%d %H:%M:%S"))
+        print('Connected with ' + addr[0] + ':' + str(addr[1]) + ', ' + time.strftime("%Y.%m.%d  %H:%M:%S"))
         threading.Thread(target=client_thread, args=(conn, int(args[2]), int(args[3]))).start()
     s.close()
 
