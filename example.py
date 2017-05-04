@@ -42,24 +42,24 @@ background_thread.start()
 # Once the server is started you can transfer the cube definition string to the server with different methods:
 
 # ----------------------------------------------------------------------------------------------------------------------
-# 1. With a webbrowser, if the server runs on the same machine on port 8080, do not forget the '?' !
-# http://localhost:8080/?DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL
+# 1. With a webbrowser, if the server runs on the same machine on port 8080
+# http://localhost:8080/DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL
 # With a webbrowser, if the server runs on server myserver.com, port 8081
-# http://myserver.com:8081/?DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL
+# http://myserver.com:8081/DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
-# 2. With telnet, just send the cube definition string
+# 2. With netcat, if the server runs on the same machine on port 8080
+# echo DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL | nc localhost 8080
 # ----------------------------------------------------------------------------------------------------------------------
 
-
 # ----------------------------------------------------------------------------------------------------------------------
-# 3. With this little graphical interface. Set
+# 3. With this little graphical interface.
 # From within a Python script start the interface with
 
 import client_gui
 
-# From a terminal you start the interface with
+# From a terminal start the interface with
 # python client_gui.py
 # ----------------------------------------------------------------------------------------------------------------------
 
