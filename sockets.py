@@ -23,15 +23,15 @@ def client_thread(conn, maxlen, timeout):
                 conn.close()
                 return
             for i in range(len(a)):
-                if a[i] in [ord('\n'), ord('\r'), ord('H'), ord('T'), ord('P'),  ord('U'), ord('R'), ord('F'), ord('D'),
-                            ord('L'), ord('B'), ord('?')]:
+                if a[i] in [ord('\n'), ord('\r'), ord('G'), ord('E'), ord('T'),  ord('U'), ord('R'), ord('F'), ord('D'),
+                            ord('L'), ord('B')]:
                     data.append(a[i])
         if data[0] == ord('X'):
             break
         defstr = ''.join(chr(i) for i in data if chr(i) > chr(32))
-        qpos = defstr.find('?')
-        if qpos >= 0 or defstr.find('HTTP') >= 0:  # in this case we suppose the client is a webbrowser
-            defstr = defstr[qpos+1:qpos+55]
+        qpos = defstr.find('GET')
+        if qpos >= 0:  # in this case we suppose the client is a webbrowser
+            defstr = defstr[qpos+3:qpos+57]
             reply = 'HTTP/1.1 200 OK' + '\n\n' + '<html><head><title>Answer from Cubesolver</title></head><body>' + '\n'
             reply += solver.solve(defstr, maxlen, timeout) + '\n' + '</body></html>' + '\n'
             conn.sendall(reply.encode())
