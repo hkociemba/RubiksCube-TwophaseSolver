@@ -19,7 +19,7 @@ def client_thread(conn, maxlen, timeout):
                     print('Connection closed', flush=True)
                     return
             except:
-                #print('Error while receiving data. Connection closed', flush=True)
+                print('Connection closed', flush=True)
                 conn.close()
                 return
             for i in range(len(a)):
