@@ -53,9 +53,6 @@ class SolverThread(thr.Thread):
             return
         ################################################################################################################
         if togo_phase2 == 0:
-            if slice_sorted != 0:  # or len(self.solutions) > 0:
-                return  # slice edges are permuted or we already found a solution (eventually in a different thread)
-
             self.lock.acquire()  # phase 2 solved, store solution
             man = self.sofar_phase1 + self.sofar_phase2
             if len(self.solutions) == 0 or (len(self.solutions[-1]) > len(man)):
@@ -220,10 +217,10 @@ def solve(cubestring, max_length=20, timeout=3):
     if len(list(set([16, 20, 24, 28]) & set(syms))) > 0:  # we have some rotational symmetry along a long diagonal
         tr = [0, 3]  # so we search only one direction and the inverse
     else:
-        tr = range(6)
+        tr = range(6)  # This means search in 3 directions + inverse cube
     if len(list(set(range(48, 96)) & set(syms))) > 0:  # we have some antisymmetry so we do not search the inverses
         tr = list(filter(lambda x: x < 3, tr))
-    for i in tr:  # search in 3 directions + inverse cube if there are no symmetries
+    for i in tr:
         th = SolverThread(cc, i % 3, i // 3, max_length, timeout, s_time, solutions, terminated, [999])
         my_threads.append(th)
         th.start()
