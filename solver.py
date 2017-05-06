@@ -191,7 +191,7 @@ class SolverThread(thr.Thread):
 def solve(cubestring, max_length=20, timeout=3):
     """Solves a cube defined by its cube definition string.
      :param cubestring: The format of the string is given in the Facelet class defined in the file enums.py
-     :param max_length: The function will return if a maneuver of lengthFFFF <= max_length has been found
+     :param max_length: The function will return if a maneuver of length<= max_length has been found
      :param timeout: If the function times out, the best solution found so far is returned. If there has not been found
      any solution yet the computation continues until a first solution appears.
     """
