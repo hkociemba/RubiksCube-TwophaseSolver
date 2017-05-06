@@ -12,8 +12,8 @@ import array as ar
 
 flipslice_twist_depth3 = None  # global variables
 corners_ud_edges_depth3 = None
-corners_depth = None
 cornslice_depth = None
+edgeslice_depth = None
 
 # ####################### functions to extract or set values in the pruning tables #####################################
 
@@ -85,7 +85,6 @@ def create_phase1_prun_table():
         depth = 0
         backsearch = False
         print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-        #print(time.clock())
         while done != total:
             depth3 = depth % 3
             if depth == 9:
@@ -161,7 +160,6 @@ def create_phase1_prun_table():
             depth += 1
             print()
             print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-            #print(time.clock())
 
         fh = open(fname, "wb")
         flipslice_twist_depth3.tofile(fh)
@@ -170,127 +168,6 @@ def create_phase1_prun_table():
         fh = open(fname, "rb")
         flipslice_twist_depth3 = ar.array('L')
         flipslice_twist_depth3.fromfile(fh, total // 16 + 1)
-    fh.close()
-
-
-def create_phase2_prun_table():
-    """Creates/loads the corners_ud_edges_depth3 pruning table for phase 2."""
-    total = defs.N_CORNERS_CLASS * defs.N_UD_EDGES
-    fname = "phase2_prun"
-    global corners_ud_edges_depth3
-    if not path.isfile(fname):
-        print("creating " + fname + " table...")
-        print('This may take an hour or even longer, depending on the hardware.')
-
-        corners_ud_edges_depth3 = ar.array('L', [0xffffffff] * (total // 16))
-        # ##################### create table with the symmetries of the corners classes ################################
-        cc = cb.CubieCube()
-        c_sym = ar.array('H', [0] * defs.N_CORNERS_CLASS)
-        for i in range(defs.N_CORNERS_CLASS):
-            if (i + 1) % 1000 == 0:
-                print('.', end='', flush=True)
-            rep = sy.corner_rep[i]
-            cc.set_corners(rep)
-            for s in range(defs.N_SYM_D4h):
-                ss = cb.CubieCube(sy.symCube[s].cp, sy.symCube[s].co, sy.symCube[s].ep,
-                                  sy.symCube[s].eo)  # copy cube
-                ss.corner_multiply(cc)  # s*cc
-                ss.corner_multiply(sy.symCube[sy.inv_idx[s]])  # s*cc*s^-1
-                if ss.get_corners() == rep:
-                    c_sym[i] |= 1 << s
-        print()
-        ################################################################################################################
-
-        c_classidx = 0  # value for solved phase 2
-        ud_edge = 0
-        set_corners_ud_edges_depth3(defs.N_UD_EDGES * c_classidx + ud_edge, 0)
-        done = 1
-        depth = 0
-        backsearch = False
-        print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-        #print(time.clock())
-        while done != total:
-            depth3 = depth % 3
-            if depth == 13:
-                # backwards search is faster for depth >= 13
-                print('flipping to backwards search...')
-                backsearch = True
-            idx = 0
-            mult = 2
-            if depth > 9:
-                mult = 1
-            for c_classidx in range(defs.N_CORNERS_CLASS):
-                if (c_classidx + 1) % (20 * mult) == 0:
-                    print('.', end='', flush=True)
-                if (c_classidx + 1) % (1600 * mult) == 0:
-                    print('')
-
-                ud_edge = 0
-                while ud_edge < defs.N_UD_EDGES:
-
-                    # ################ if table entries are not populated, this is very fast: ##########################
-                    if not backsearch and idx % 16 == 0 and corners_ud_edges_depth3[idx // 16] == 0xffffffff \
-                            and ud_edge < defs.N_UD_EDGES - 16:
-                        ud_edge += 16
-                        idx += 16
-                        continue
-                    ####################################################################################################
-
-                    if backsearch:
-                        match = (get_corners_ud_edges_depth3(idx) == 3)
-                    else:
-                        match = (get_corners_ud_edges_depth3(idx) == depth3)
-
-                    if match:
-                        corner = sy.corner_rep[c_classidx]
-                        # only iterate phase 2 moves
-                        for m in (enums.Move.U1, enums.Move.U2, enums.Move.U3, enums.Move.R2, enums.Move.F2,
-                                  enums.Move.D1, enums.Move.D2, enums.Move.D3, enums.Move.L2, enums.Move.B2):
-                            ud_edge1 = mv.ud_edges_move[18 * ud_edge + m]
-                            corner1 = mv.corners_move[18 * corner + m]
-                            c1_classidx = sy.corner_classidx[corner1]
-                            c1_sym = sy.corner_sym[corner1]
-                            ud_edge1 = sy.ud_edges_conj[(ud_edge1 << 4) + c1_sym]
-                            idx1 = 40320 * c1_classidx + ud_edge1  # N_UD_EDGES = 40320
-                            if not backsearch:
-                                if get_corners_ud_edges_depth3(idx1) == 3:  # entry not yet filled
-                                    set_corners_ud_edges_depth3(idx1, (depth + 1) % 3)
-                                    done += 1
-                                    # ######symmetric position has eventually more than one representation #############
-                                    sym = c_sym[c1_classidx]
-                                    if sym != 1:
-                                        for j in range(1, 16):
-                                            sym >>= 1
-                                            if sym % 2 == 1:
-                                                ud_edge2 = sy.ud_edges_conj[(ud_edge1 << 4) + j]
-                                                # c1_classidx does not change
-                                                idx2 = 40320 * c1_classidx + ud_edge2
-                                                if get_corners_ud_edges_depth3(idx2) == 3:
-                                                    set_corners_ud_edges_depth3(idx2, (depth + 1) % 3)
-                                                    done += 1
-                                    ####################################################################################
-
-                            else:
-                                if get_corners_ud_edges_depth3(idx1) == depth3:
-                                    set_corners_ud_edges_depth3(idx, (depth + 1) % 3)
-                                    done += 1
-                                    break
-                    ud_edge += 1
-                    idx += 1  # idx = defs.N_UD_EDGEPERM * corner_classidx + ud_edge
-
-            depth += 1
-            print()
-            print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-            #print(time.clock())
-
-        fh = open(fname, "wb")
-        corners_ud_edges_depth3.tofile(fh)
-    else:
-        print("loading " + fname + " table...")
-        fh = open(fname, "rb")
-        corners_ud_edges_depth3 = ar.array('L')
-        corners_ud_edges_depth3.fromfile(fh, total // 16)
-
     fh.close()
 
 
@@ -334,6 +211,47 @@ def create_phase2_cornsliceprun_table():
         cornslice_depth.fromfile(fh, defs.N_CORNERS * defs.N_PERM_4)
     fh.close()
 
+
+def create_phase2_edgesliceprun_table():
+    """Creates/loads the edgeslice_depth pruning table for phase 2."""
+    fname = "phase2_edgesliceprun"
+    global edgeslice_depth
+    if not path.isfile(fname):
+        print("creating " + fname + " table...")
+        edgeslice_depth = ar.array('b', [-1] * (defs.N_UD_EDGES * defs.N_PERM_4))
+        edges = 0  # values for solved phase 2
+        slice_ = 0
+        edgeslice_depth[defs.N_PERM_4 * edges + slice_] = 0
+        done = 1
+        depth = 0
+        idx = 0
+        while done != defs.N_UD_EDGES * defs.N_PERM_4:
+            for edges in range(defs.N_UD_EDGES):
+                for slice_ in range(defs.N_PERM_4):
+                    if edgeslice_depth[defs.N_PERM_4 * edges + slice_] == depth:
+                        for m in (enums.Move.U1, enums.Move.U2, enums.Move.U3, enums.Move.R2, enums.Move.F2,
+                                  enums.Move.D1, enums.Move.D2, enums.Move.D3, enums.Move.L2, enums.Move.B2):
+                            edges1 = mv.ud_edges_move[18 * edges + m]
+                            slice_1 = mv.slice_sorted_move[18 * slice_ + m]
+                            idx1 = defs.N_PERM_4 * edges1 + slice_1
+                            if edgeslice_depth[idx1] == -1:  # entry not yet filled
+                                edgeslice_depth[idx1] = depth + 1
+                                done += 1
+                                if done % 20000 == 0:
+                                    print('.', end='', flush=True)
+
+            depth += 1
+        print()
+        fh = open(fname, "wb")
+        edgeslice_depth.tofile(fh)
+    else:
+        print("loading " + fname + " table...")
+        fh = open(fname, "rb")
+        edgeslice_depth = ar.array('b')
+        edgeslice_depth.fromfile(fh, defs.N_CORNERS * defs.N_PERM_4)
+    fh.close()
+
+
 # array distance computes the new distance from the old_distance i and the new_distance_mod3 j. ########################
 # We need this array because the pruning tables only store the distances mod 3. ########################################
 distance = ar.array('b', [0 for i in range(60)])
@@ -346,5 +264,5 @@ for i in range(20):
             distance[3 * i + j] -= 3
 
 create_phase1_prun_table()
-create_phase2_prun_table()
 create_phase2_cornsliceprun_table()
+create_phase2_edgesliceprun_table()

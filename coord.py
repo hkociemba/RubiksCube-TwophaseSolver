@@ -48,10 +48,6 @@ class CoordCube:
             self.flipslice_classidx = sy.flipslice_classidx[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
             self.flipslice_sym = sy.flipslice_sym[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
             self.flipslice_rep = sy.flipslice_rep[self.flipslice_classidx]
-            # symmetry reduced corner permutation coordinate used in phase 2
-            self.corner_classidx = sy.corner_classidx[self.corners]
-            self.corner_sym = sy.corner_sym[self.corners]
-            self.corner_rep = sy.corner_rep[self.corner_classidx]
 
     def __str__(self):
         s = '(twist: ' + str(self.twist) + ', flip: ' + str(self.flip) + ', slice: ' + str(self.slice_sorted//24) +\
