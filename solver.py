@@ -13,9 +13,9 @@ import time
 
 class SolverThread(thr.Thread):
 
-    def __init__(self, cube, rot, inv, ret_length, timeout, start_time, solutions, terminated, shortest_length):
+    def __init__(self, cb_cube, rot, inv, ret_length, timeout, start_time, solutions, terminated, shortest_length):
         """
-        :param cube: The cube to be solved in CubieCube representation
+        :param cb_cube: The cube to be solved in CubieCube representation
         :param rot: Rotates the  cube 120° * rot along the long diagonal before applying the two-phase-algorithm
         :param inv: 0: Do not invert the cube . 1: Invert the cube before applying the two-phase-algorithm
         :param ret_length: If a solution with length <= ret_length is found the search stops.
@@ -31,8 +31,8 @@ class SolverThread(thr.Thread):
         :param shortest_length: The length of the shortes solutions in the solution array
         """
         thr.Thread.__init__(self)
-        self.cube = cube
-        self.co = None
+        self.cb_cube = cb_cube  # CubieCube
+        self.co_cube = None  # CoordCube initialized in function run
         self.rot = rot
         self.inv = inv
         self.sofar_phase1 = []
@@ -42,7 +42,9 @@ class SolverThread(thr.Thread):
         self.timeout = timeout
         self.start_time = start_time
 
-        # these variables are shared by the six threads
+        self.cornersave = 0
+
+        # these variables are shared by the six threads, initialized in function solve
         self.solutions = solutions
         self.terminated = terminated
         self.shortest_length = shortest_length
@@ -110,24 +112,28 @@ class SolverThread(thr.Thread):
                 self.terminated.set()
 
             # compute initial phase 2 coordinates
-            u_edges = self.co.u_edges
-            d_edges = self.co.d_edges
-            corners = self.co.corners
-
-            for m in self.sofar_phase1:  # get current corner configuration
-                corners = mv.corners_move[18 * corners + m]
+            m = self.sofar_phase1[-1]
+            if m in [en.Move.R3, en.Move.F3, en.Move.L3, en.Move.B3]:  # phase 1 solution come in pairs
+                corners = mv.corners_move[18 * self.cornersave + m - 1]  # apply R2, F2, L2 ord B2 on last ph1 solution
+            else:
+                corners = self.co_cube.corners
+                for m in self.sofar_phase1:  # get current corner configuration
+                    corners = mv.corners_move[18 * corners + m]
+                self.cornersave = corners
 
             # new solution must be shorter and we do not use phase 2 maneuvers with length > 11 - 1 = 10
             togo2_limit = min(self.shortest_length[0] - len(self.sofar_phase1), 11)
             if pr.cornslice_depth[24 * corners + slice_sorted] >= togo2_limit: # this precheck speeds up the computation
                 return
 
+            u_edges = self.co_cube.u_edges
+            d_edges = self.co_cube.d_edges
             for m in self.sofar_phase1:
                 u_edges = mv.u_edges_move[18 * u_edges + m]
                 d_edges = mv.d_edges_move[18 * d_edges + m]
             ud_edges = coord.u_edges_plus_d_edges_to_ud_edges[24 * u_edges + d_edges % 24]
 
-            dist2 = self.co.get_depth_phase2(corners, ud_edges)
+            dist2 = self.co_cube.get_depth_phase2(corners, ud_edges)
             for togo2 in range(dist2, togo2_limit):  # do not use more than togo2_limit - 1 moves in phase 2
                 self.sofar_phase2 = []
                 self.search_phase2(corners, ud_edges, slice_sorted, dist2, togo2)
@@ -166,26 +172,26 @@ class SolverThread(thr.Thread):
     def run(self):
         cb = None
         if self.rot == 0:  # no rotation
-            cb = cubie.CubieCube(self.cube.cp, self.cube.co, self.cube.ep, self.cube.eo)
+            cb = cubie.CubieCube(self.cb_cube.cp, self.cb_cube.co, self.cb_cube.ep, self.cb_cube.eo)
         elif self.rot == 1:  # conjugation by 120° rotation
             cb = cubie.CubieCube(sy.symCube[32].cp, sy.symCube[32].co, sy.symCube[32].ep, sy.symCube[32].eo)
-            cb.multiply(self.cube)
+            cb.multiply(self.cb_cube)
             cb.multiply(sy.symCube[16])
         elif self.rot == 2:  # conjugation by 240° rotation
             cb = cubie.CubieCube(sy.symCube[16].cp, sy.symCube[16].co, sy.symCube[16].ep, sy.symCube[16].eo)
-            cb.multiply(self.cube)
+            cb.multiply(self.cb_cube)
             cb.multiply(sy.symCube[32])
         if self.inv == 1:  # invert cube
             tmp = cubie.CubieCube()
             cb.inv_cubie_cube(tmp)
             cb = tmp
 
-        self.co = coord.CoordCube(cb)  # the rotated/inverted cube in coordinate representation
+        self.co_cube = coord.CoordCube(cb)  # the rotated/inverted cube in coordinate representation
 
-        dist = self.co.get_depth_phase1()
+        dist = self.co_cube.get_depth_phase1()
         for togo1 in range(dist, 20):  # iterative deepening, solution has at least dist moves
             self.sofar_phase1 = []
-            self.search(self.co.flip, self.co.twist, self.co.slice_sorted, dist, togo1)
+            self.search(self.co_cube.flip, self.co_cube.twist, self.co_cube.slice_sorted, dist, togo1)
 #################################End class SolverThread#################################################################
 
 
@@ -209,7 +215,7 @@ def solve(cubestring, max_length=20, timeout=3):
     s_time = time.monotonic()
 
     # these mutable variables are modidified by all six threads
-    s_length = [999]  # todo: see if lists are necessary here
+    s_length = [999]
     solutions = []
     terminated = thr.Event()
     terminated.clear()
@@ -227,8 +233,9 @@ def solve(cubestring, max_length=20, timeout=3):
     for t in my_threads:
         t.join()  # wait until all threads have finished
     s = ''
-    for m in solutions[-1]:  # the last solution is the shortest
-        s += m.name + ' '
+    if len(solutions) > 0:
+        for m in solutions[-1]:  # the last solution is the shortest
+            s += m.name + ' '
     return s + '(' + str(len(s)//3) + 'f)'
 ########################################################################################################################
 
