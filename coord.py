@@ -48,6 +48,10 @@ class CoordCube:
             self.flipslice_classidx = sy.flipslice_classidx[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
             self.flipslice_sym = sy.flipslice_sym[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
             self.flipslice_rep = sy.flipslice_rep[self.flipslice_classidx]
+            # symmetry reduced corner permutation coordinate used in phase 2
+            self.corner_classidx = sy.corner_classidx[self.corners]
+            self.corner_sym = sy.corner_sym[self.corners]
+            self.corner_rep = sy.corner_rep[self.corner_classidx]
 
     def __str__(self):
         s = '(twist: ' + str(self.twist) + ', flip: ' + str(self.flip) + ', slice: ' + str(self.slice_sorted//24) +\
@@ -114,7 +118,8 @@ class CoordCube:
         classidx = sy.corner_classidx[corners]
         sym = sy.corner_sym[corners]
         depth_mod3 = pr.get_corners_ud_edges_depth3(N_UD_EDGES * classidx + sy.ud_edges_conj[(ud_edges << 4) + sym])
-
+        if depth_mod3 == 3:  # unfilled entry, depth >= 11
+            return 11
         depth = 0
         while corners != SOLVED or ud_edges != SOLVED:
             if depth_mod3 == 0:

@@ -47,7 +47,7 @@ class SolverThread(thr.Thread):
         self.terminated = terminated
         self.shortest_length = shortest_length
 
-    def search_phase2(self, corners, ud_edges, slice_sorted, togo_phase2):
+    def search_phase2(self, corners, ud_edges, slice_sorted, dist, togo_phase2):
         # ##############################################################################################################
         if self.terminated.is_set():
             return
@@ -87,12 +87,16 @@ class SolverThread(thr.Thread):
                 ud_edges_new = mv.ud_edges_move[18 * ud_edges + m]
                 slice_sorted_new = mv.slice_sorted_move[18 * slice_sorted + m]
 
-                if max(pr.edgeslice_depth[24 * ud_edges_new + slice_sorted_new],
-                       pr.cornslice_depth[24 * corners_new + slice_sorted_new]) >= togo_phase2:
-                    continue
+                classidx = sy.corner_classidx[corners_new]
+                sym = sy.corner_sym[corners_new]
+                dist_new_mod3 = pr.get_corners_ud_edges_depth3(
+                    40320 * classidx + sy.ud_edges_conj[(ud_edges_new << 4) + sym])
+                dist_new = pr.distance[3 * dist + dist_new_mod3]
+                if max(dist_new, pr.cornslice_depth[24 * corners_new + slice_sorted_new]) >= togo_phase2:
+                    continue  # impossible to reach solved cube in togo_phase2 - 1 moves
 
                 self.sofar_phase2.append(m)
-                self.search_phase2(corners_new, ud_edges_new, slice_sorted_new, togo_phase2 - 1)
+                self.search_phase2(corners_new, ud_edges_new, slice_sorted_new, dist_new, togo_phase2 - 1)
                 self.sofar_phase2.pop(-1)
 
     def search(self, flip, twist, slice_sorted, dist, togo_phase1):
@@ -113,23 +117,20 @@ class SolverThread(thr.Thread):
             for m in self.sofar_phase1:  # get current corner configuration
                 corners = mv.corners_move[18 * corners + m]
 
-            # new solution must be shorter and we do not use phase 2 maneuvers with length > 9
-            togo2_limit = min(self.shortest_length[0] - len(self.sofar_phase1), 10)
-            pcs = pr.cornslice_depth[24 * corners + slice_sorted]
-            if pcs >= togo2_limit:  # precheck
+            # new solution must be shorter and we do not use phase 2 maneuvers with length > 11 - 1 = 10
+            togo2_limit = min(self.shortest_length[0] - len(self.sofar_phase1), 11)
+            if pr.cornslice_depth[24 * corners + slice_sorted] >= togo2_limit: # this precheck speeds up the computation
                 return
 
             for m in self.sofar_phase1:
                 u_edges = mv.u_edges_move[18 * u_edges + m]
                 d_edges = mv.d_edges_move[18 * d_edges + m]
             ud_edges = coord.u_edges_plus_d_edges_to_ud_edges[24 * u_edges + d_edges % 24]
-            pes = pr.edgeslice_depth[24 * ud_edges + slice_sorted]
-            if pes >= togo2_limit:  # precheck
-                return
 
-            for togo2 in range(max(pcs, pes), togo2_limit):
+            dist2 = self.co.get_depth_phase2(corners, ud_edges)
+            for togo2 in range(dist2, togo2_limit):  # do not use more than togo2_limit - 1 moves in phase 2
                 self.sofar_phase2 = []
-                self.search_phase2(corners, ud_edges, slice_sorted, togo2)
+                self.search_phase2(corners, ud_edges, slice_sorted, dist2, togo2)
 
         else:
             for m in en.Move:
@@ -191,7 +192,7 @@ class SolverThread(thr.Thread):
 def solve(cubestring, max_length=20, timeout=3):
     """Solves a cube defined by its cube definition string.
      :param cubestring: The format of the string is given in the Facelet class defined in the file enums.py
-     :param max_length: The function will return if a maneuver of length<= max_length has been found
+     :param max_length: The function will return if a maneuver of length <= max_length has been found
      :param timeout: If the function times out, the best solution found so far is returned. If there has not been found
      any solution yet the computation continues until a first solution appears.
     """
@@ -212,7 +213,7 @@ def solve(cubestring, max_length=20, timeout=3):
     solutions = []
     terminated = thr.Event()
     terminated.clear()
-    syms = cc.symmetries()
+    syms = cc.symmetries();
     if len(list(set([16, 20, 24, 28]) & set(syms))) > 0:  # we have some rotational symmetry along a long diagonal
         tr = [0, 3]  # so we search only one direction and the inverse
     else:

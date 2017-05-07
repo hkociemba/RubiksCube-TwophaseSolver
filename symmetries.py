@@ -218,3 +218,61 @@ else:
     fh.close()
 ########################################################################################################################
 
+# ############ generate the tables to handle the symmetry reduced corner permutation coordinate in phase 2##############
+fname1 = "co_classidx"
+fname2 = "co_sym"
+fname3 = "co_rep"
+if not (path.isfile(fname1) and path.isfile(fname2) and path.isfile(fname3)):
+    print("creating " + "corner sym-tables...")
+    corner_classidx = ar.array('H', [INVALID] * N_CORNERS)  # idx -> classidx
+    corner_sym = ar.array('B', [0] * N_CORNERS)  # idx -> symmetry
+    corner_rep = ar.array('H', [0] * N_CORNERS_CLASS)  # classidx -> idx of representant
+
+    classidx = 0
+    cc = cb.CubieCube()
+    for cp in range(N_CORNERS):
+        cc.set_corners(cp)
+        if (cp + 1) % 8000 == 0:
+            print('.', end='', flush=True)
+
+        if corner_classidx[cp] == INVALID:
+            corner_classidx[cp] = classidx
+            corner_sym[cp] = 0
+            corner_rep[classidx] = cp
+        else:
+            continue
+        for s in range(N_SYM_D4h):  # conjugate representant by all 16 symmetries
+            ss = cb.CubieCube(symCube[inv_idx[s]].cp, symCube[inv_idx[s]].co, symCube[inv_idx[s]].ep,
+                              symCube[inv_idx[s]].eo)  # copy cube
+            ss.corner_multiply(cc)
+            ss.corner_multiply(symCube[s])  # s^-1*cc*s
+            cp_new = ss.get_corners()
+            if corner_classidx[cp_new] == INVALID:
+                corner_classidx[cp_new] = classidx
+                corner_sym[cp_new] = s
+        classidx += 1
+    print('')
+    fh = open(fname1, 'wb')
+    corner_classidx.tofile(fh)
+    fh.close()
+    fh = open(fname2, 'wb')
+    corner_sym.tofile(fh)
+    fh.close()
+    fh = open(fname3, 'wb')
+    corner_rep.tofile(fh)
+    fh.close()
+
+else:
+    fh = open(fname1, 'rb')
+    corner_classidx = ar.array('H')
+    corner_classidx.fromfile(fh,N_CORNERS)
+    fh.close()
+    fh = open(fname2, 'rb')
+    corner_sym = ar.array('B')
+    corner_sym.fromfile(fh, N_CORNERS)
+    fh.close()
+    fh = open(fname3, 'rb')
+    corner_rep = ar.array('H')
+    corner_rep.fromfile(fh, N_CORNERS_CLASS)
+    fh.close()
+########################################################################################################################
