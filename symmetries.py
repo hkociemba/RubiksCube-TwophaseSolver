@@ -101,7 +101,7 @@ for s in range(N_SYM):
 # ####### generate the phase 1 table for the conjugation of the twist t by a symmetry s. conj_twist[t, s] = s*t*s^-1####
 fname = "conj_twist"
 if not path.isfile(fname):
-    print('On the first run, several tables will be created. This takes from 1 hour (e.g. PC) to 12 hours '
+    print('On the first run, several tables will be created. This takes from 1/2 hour (e.g. PC) to 6 hours '
           '(e.g. RaspberryPi3), depending on the hardware.')
     print("creating " + fname + " table...")
     twist_conj = ar.array('H', [0] * (N_TWIST * N_SYM_D4h))

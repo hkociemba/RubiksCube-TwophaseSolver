@@ -7,7 +7,6 @@ import coord
 import enums as en
 import moves as mv
 import pruning as pr
-#import face
 import time
 
 
@@ -35,8 +34,8 @@ class SolverThread(thr.Thread):
         self.co_cube = None  # CoordCube initialized in function run
         self.rot = rot
         self.inv = inv
-        self.sofar_phase1 = []
-        self.sofar_phase2 = []
+        self.sofar_phase1 = None
+        self.sofar_phase2 = None
         self.lock = thr.Lock()
         self.ret_length = ret_length
         self.timeout = timeout
@@ -238,4 +237,3 @@ def solve(cubestring, max_length=20, timeout=3):
             s += m.name + ' '
     return s + '(' + str(len(s)//3) + 'f)'
 ########################################################################################################################
-
