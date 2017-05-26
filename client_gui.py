@@ -28,7 +28,7 @@ def show_text(txt):
 
 
 def create_facelet_rects(a):
-    """Initializes the facelet grid on the canvas"""
+    """Initializes the facelet grid on the canvas."""
     offset = ((1, 0), (2, 1), (1, 1), (1, 2), (0, 1), (3, 1))
     for f in range(6):
         for row in range(3):
@@ -71,7 +71,7 @@ def get_definition_string():
 
 
 def solve():
-    """Connects to the server and returns the solving maneuver"""
+    """Connects to the server and returns the solving maneuver."""
     display.delete(1.0, END)  # clear output window
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -128,7 +128,7 @@ def empty():
 
 
 def random():
-    """ Generates a random cube and sets the corresponding faclet colors."""
+    """Generates a random cube and sets the corresponding facelet colors."""
     cc = cubie.CubieCube()
     cc.randomize()
     fc = cc.to_facelet_cube()
@@ -144,7 +144,7 @@ def random():
 
 
 def click(event):
-    """Defines how to react on left mouseclicks"""
+    """Defines how to react on left mouse clicks"""
     global curcol
     idlist = canvas.find_withtag("current")
     if len(idlist) > 0:

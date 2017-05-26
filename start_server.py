@@ -1,14 +1,12 @@
 # ################# Start the server and listen for connections ########################################################
 
-from face import FaceCube
 import sockets
 import sys
-import solver as sv
 
 
 if __name__ == '__main__':  # file is executed
     if len(sys.argv) < 2:
-        sys.argv.append(str(8080))  # Port 8080 default prot
+        sys.argv.append(str(8080))  # Port 8080 default port
     if len(sys.argv) < 3:
         sys.argv.append(str(20))  # 20 moves default maximal return length of maneuver
     if len(sys.argv) < 4:
@@ -17,4 +15,4 @@ if __name__ == '__main__':  # file is executed
     sockets.server_start(sys.argv)
 else:
     def start(port, maxmoves, timeout):
-        sockets.server_start((-1,port, maxmoves, timeout))
+        sockets.server_start((-1, port, maxmoves, timeout))
