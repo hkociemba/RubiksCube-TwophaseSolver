@@ -9,6 +9,6 @@ There are several tables which must be created on the first run. These need abou
 
 "python example.py" or eventually "python3 example.py"
 
-Make sure that you use Python 3. 
+Make sure that you use Python 3.4 or higher and you have the numpy package installed. 
 
 ![](gui_client.jpg "")
