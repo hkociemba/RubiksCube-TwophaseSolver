@@ -4,8 +4,7 @@ cubestring = 'DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL'  # cube de
 # See module enums.py for the format of the cube definition string
 
 # ######################### Method 1: directly call the solve routine# #################################################
-# Advantage: No network layer needed. Disadvantage: For each solve, the tables have to be loaded which takes a few     #
-# seconds for each new solve.                                                                                          #
+# Advantage: No network layer needed. Disadvantage: Only local usage possible.                                                                  #
 ########################################################################################################################
 
 #  Uncomment this part if you want to use method 1

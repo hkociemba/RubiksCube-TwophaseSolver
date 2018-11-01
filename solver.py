@@ -111,7 +111,11 @@ class SolverThread(thr.Thread):
                 self.terminated.set()
 
             # compute initial phase 2 coordinates
-            m = self.sofar_phase1[-1]
+            if self.sofar_phase1:  # check if list is not empty
+                m = self.sofar_phase1[-1]
+            else:
+                m = en.Move.U1  # value is irrelevant here, no phase 1 moves
+
             if m in [en.Move.R3, en.Move.F3, en.Move.L3, en.Move.B3]:  # phase 1 solution come in pairs
                 corners = mv.corners_move[18 * self.cornersave + m - 1]  # apply R2, F2, L2 ord B2 on last ph1 solution
             else:

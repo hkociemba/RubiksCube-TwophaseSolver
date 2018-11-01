@@ -10,7 +10,7 @@ from os import path
 import time
 import array as ar
 
-flipslice_twist_depth3 = None  # global variables
+flipslice_twist_depth3 = None  # global variables, initialized during pruning table cration
 corners_ud_edges_depth3 = None
 cornslice_depth = None
 edgeslice_depth = None
@@ -92,7 +92,7 @@ def create_phase1_prun_table():
                 print('flipping to backwards search...')
                 backsearch = True
             if depth < 8:
-                mult = 5
+                mult = 5  # controls the output a few lines below
             else:
                 mult = 1
             idx = 0

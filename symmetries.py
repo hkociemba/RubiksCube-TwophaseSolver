@@ -98,7 +98,7 @@ for s in range(N_SYM):
                 conj_move[m][s] = m2
 ########################################################################################################################
 
-# ####### generate the phase 1 table for the conjugation of the twist t by a symmetry s. conj_twist[t, s] = s*t*s^-1####
+# ####### generate the phase 1 table for the conjugation of the twist t by a symmetry s. twist_conj[t, s] = s*t*s^-1####
 fname = "conj_twist"
 if not path.isfile(fname):
     print('On the first run, several tables will be created. This takes from 1/2 hour (e.g. PC) to 6 hours '
@@ -263,6 +263,8 @@ if not (path.isfile(fname1) and path.isfile(fname2) and path.isfile(fname3)):
     fh.close()
 
 else:
+    print("loading " + "corner sym-tables...")
+
     fh = open(fname1, 'rb')
     corner_classidx = ar.array('H')
     corner_classidx.fromfile(fh,N_CORNERS)
