@@ -12,3 +12,5 @@ There are several tables which must be created on the first run. These need abou
 Make sure that you use Python 3.4 or higher and you have the numpy package installed. 
 
 ![](gui_client.jpg "")
+
+If you run the script "computer_vision.py" you have the possibility to enter the facelet colors with a webcam. There are several parameters which have an influence on the facelet detection quality. TODO: Explain how to choose the parameters for good facelet detection.
