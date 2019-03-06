@@ -17,3 +17,7 @@ yellow_H = 50  # highest allowed hue for color yellow
 green_H = 100  # highest allowed hue for color green
 blue_H = 160  # highest allowed hue for color blue
 # hue values > blue_H and < orange_L describe the color red
+
+
+fc = [['red', 'red', 'red'], ['red', 'red', 'red'], ['red', 'red', 'red']]
+

@@ -13,7 +13,7 @@ import vision_params
 DEFAULT_HOST = 'localhost'
 DEFAULT_PORT = '8080'
 width = 60  # width of a facelet in pixels
-facelet_id = [[[0 for col in range(3)] for row in range(3)] for face in range(6)]
+facelet_id = [[[0 for col in range(3)] for row in range(3)] for fc in range(6)]
 colorpick_id = [0 for i in range(6)]
 curcol = None
 t = ("U", "R", "F", "D", "L", "B")
@@ -192,6 +192,16 @@ def set_delta_C(val):
     vision_params.delta_C = int(val)
 
 
+def transfer():
+    centercol = vision_params.fc[1][1]
+    dc = {}
+    for i in range(6):
+        dc[canvas.itemcget(facelet_id[i][1][1], "fill")] = i
+    for i in range(3):
+        for j in range(3):
+            canvas.itemconfig(facelet_id[dc[centercol]][i][j], fill=vision_params.fc[i][j])
+
+
 #  ###################################### Generate and display the TK_widgets ##########################################
 
 root = Tk()
@@ -261,11 +271,11 @@ s_delta_C = Scale(root, from_=10, to=0, length=width*1.4, showvalue=0, label='co
 canvas.create_window(10+width*1.5, 12 + 8.4 * width, anchor=NW, window=s_delta_C)
 s_delta_C.set(vision_params.delta_C)
 
-
-t = Thread(target=grab_colors, args=())
-t.start()
-
+btransfer = Button(text="Apply webcam colors", height=2, width=20, relief=RAISED, command=transfer)
+canvas.create_window(10 + 0.1 * width, 10 + 2.1 * width, anchor=NW, window=btransfer)
 
 root.mainloop()
+
+
 ########################################################################################################################
 

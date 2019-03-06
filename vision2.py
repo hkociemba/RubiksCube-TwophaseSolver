@@ -111,37 +111,76 @@ def antifacelets(co, ed, med):
     return acf, aef
 
 
-def getcolor(bgrcap, p):
-    #global hsv
+def showcolor(bgrcap, p):
+    p = p.astype(np.uint16)
+    col = getcolor(p)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    tz = cv2.getTextSize(col, font, 0.4, 1)[0]
+    cv2.putText(
+        bgrcap, getcolor(p), tuple(p - (tz[0]//2, -tz[1]//2)), font, 0.4, (0, 0, 0), 1)
+
+
+def getcolor(p):
     sz = 10
     p = p.astype(np.uint16)
     rect = hsv[p[1] - sz:p[1] + sz, p[0] - sz:p[0] + sz]
     median = np.sum(rect, axis=(0, 1)) / sz / sz / 4
     mh, ms, mv = median
     if ms < vision_params.sat_W and mv > vision_params.val_W:
-        cv2.putText(
-            bgrcap, 'white', tuple(p - (16, -3)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1)
+        return 'white'
     elif vision_params.orange_L <= mh < vision_params.orange_H:
-        cv2.putText(
-            bgrcap, 'orange', tuple(p - (21, -3)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1)
+        return 'orange'
     elif vision_params.orange_H <= mh < vision_params.yellow_H:
-        cv2.putText(
-            bgrcap, 'yellow', tuple(p - (19, -3)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1)
+        return 'yellow'
     elif vision_params.yellow_H <= mh < vision_params.green_H:
-        cv2.putText(
-            bgrcap, 'green', tuple(p - (18, -3)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+        return 'green'
     elif vision_params.green_H <= mh < vision_params.blue_H:
-        cv2.putText(
-            bgrcap, 'blue', tuple(p - (13, -3)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+        return 'blue'
     else:
-        cv2.putText(
-            bgrcap, 'red', tuple(p - (11, -3)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+        return 'red'
+
+
+def getcolors(bgrcap, co, ed, aco, aed, m):
+    centers = [[m for y in range(3)] for x in range(3)]
+    colors = [['red' for y in range(3)] for x in range(3)]
+    cocents = co + aco
+    if len(cocents) != 4:
+        return []
+    edcents =  ed + aed
+    if len(edcents) != 4:
+        return
+    for i in cocents:
+        if i[0] < m[0] and i[1] < m[1]:
+            centers[0][0] = i
+        elif i[0] > m[0] and i[1] < m[1]:
+            centers[0][2] = i
+        elif i[0] < m[0] and i[1] > m[1]:
+            centers[2][0] = i
+        elif i[0] > m[0] and i[1] > m[1]:
+            centers[2][2] = i
+
+    for i in edcents:
+        if i[1] < centers[0][1][1]:
+            centers[0][1] = i
+    for i in edcents:
+        if i[0] < centers[1][0][0]:
+            centers[1][0] = i
+    for i in edcents:
+        if i[0] > centers[1][2][0]:
+            centers[1][2] = i
+    for i in edcents:
+        if i[1] > centers[2][1][1]:
+            centers[2][1] = i
+    #cv2.circle(bgrcap, tuple(centers[2][1].astype(np.uint16)), 8, (128, 128, 128), -1)
+    for x in range(3):
+        for y in range(3):
+            colors[x][y] = getcolor(centers[x][y])
+    return colors
 
 
 def find_squares(bgrcap, n):
-    global hsv, r_mask, color_filter, white_filter, black_filter
+    global r_mask, color_filter, white_filter, black_filter
 
-    # hsv = cv2.cvtColor(bgrcap, cv2.COLOR_BGR2HSV).astype(float)
     h, s, v = cv2.split(hsv)
     h_sqr = np.square(h)
 
@@ -233,6 +272,9 @@ def grab_colors():
     global cent, width, height, hsv, color_filter, white_filter
     cap = cv2.VideoCapture(0)
     _, bgrcap = cap.read()
+    if bgrcap is None:
+        print('Cannot connect to webcam!')
+        return
     height, width = bgrcap.shape[:2]
     while 1:
 
@@ -250,28 +292,30 @@ def grab_colors():
         #     cv2.circle(bgrcap, txple(i.astype(np.uint16)), 5, (128, 128, 128), -1)
         m = medoid(cent)
 
-        ef, cf = facelets(cent, m)
+        cf, ef = facelets(cent, m)
         acf, aef = antifacelets(cf, ef, m)
 
-        getcolor(bgrcap, m)
+        showcolor(bgrcap, m)
         for i in ef:
-            getcolor(bgrcap, i)
+            showcolor(bgrcap, i)
         for i in cf:
-            getcolor(bgrcap, i)
+            showcolor(bgrcap, i)
         for i in aef:
-            getcolor(bgrcap, i)
+            showcolor(bgrcap, i)
         for i in acf:
-            getcolor(bgrcap, i)
+            showcolor(bgrcap, i)
+
+        vision_params.fc = getcolors(bgrcap, cf, ef, acf, aef, m)
 
         # drawgrid(bgrcap, grid_N)
         cv2.imshow('color_filter', cv2.resize(color_filter, (width // 2, height // 2)))
         cv2.imshow('white_filter', cv2.resize(white_filter, (width // 2, height // 2)))
         cv2.imshow('black_filter', cv2.resize(black_filter, (width // 2, height // 2)))
-        cv2.imshow('bgr', bgrcap)
+        cv2.imshow('Webcam - type "x" to quit.', bgrcap)
 
         k = cv2.waitKey(5) & 0xFF
         if k == 120:  # x
             break
 
-
+#grab_colors()
 cv2.destroyAllWindows()

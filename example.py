@@ -58,6 +58,7 @@ background_thread.start()
 
 import client_gui
 
+
 # From a terminal start the interface with
 # python client_gui.py
 # ----------------------------------------------------------------------------------------------------------------------
