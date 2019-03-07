@@ -1,5 +1,8 @@
 # ################ A simple graphical interface which communicates with the server #####################################
 
+# while client_gui only allows to set the facelets with the mouse, this file (client_gui2) also takes input from the
+# webcam and includes sliders for some opencv parameters
+
 from tkinter import *
 import socket
 import face
@@ -7,7 +10,6 @@ import cubie
 from threading import Thread
 from vision2 import grab_colors
 import vision_params
-
 
 # ################################## some global variables and constants ###############################################
 DEFAULT_HOST = 'localhost'
@@ -18,6 +20,8 @@ colorpick_id = [0 for i in range(6)]
 curcol = None
 t = ("U", "R", "F", "D", "L", "B")
 cols = ("yellow", "green", "red", "white", "blue", "orange")
+
+
 ########################################################################################################################
 
 # ################################################ Diverse functions ###################################################
@@ -50,8 +54,8 @@ def create_colorpick_rects(a):
     global curcol
     global cols
     for i in range(6):
-        x = (i % 3)*(a+5) + 7*a
-        y = (i // 3)*(a+5) + 7*a
+        x = (i % 3) * (a + 5) + 7 * a
+        y = (i // 3) * (a + 5) + 7 * a
         colorpick_id[i] = canvas.create_rectangle(x, y, x + a, y + a, fill=cols[i])
         canvas.itemconfig(colorpick_id[0], width=4)
         curcol = cols[0]
@@ -68,6 +72,8 @@ def get_definition_string():
             for col in range(3):
                 s += color_to_facelet[canvas.itemcget(facelet_id[f][row][col], "fill")]
     return s
+
+
 ########################################################################################################################
 
 # ############################### Solve the displayed cube with a local or remote server ###############################
@@ -97,17 +103,19 @@ def solve():
         return
     show_text('Connected with ' + remote_ip + '\n')
     try:
-        defstr = get_definition_string()+'\n'
+        defstr = get_definition_string() + '\n'
     except:
         show_text('Invalid facelet configuration.\nWrong or missing colors.')
         return
     show_text(defstr)
     try:
-        s.sendall((defstr+'\n').encode())
+        s.sendall((defstr + '\n').encode())
     except:
         show_text('Cannot send cube configuration to server.')
         return
     show_text(s.recv(2048).decode())
+
+
 ########################################################################################################################
 
 # ################################# Functions to change the facelet colors #############################################
@@ -139,8 +147,10 @@ def random():
     for f in range(6):
         for row in range(3):
             for col in range(3):
-                canvas.itemconfig(facelet_id[f][row][col], fill=cols[fc.f[idx]] )
+                canvas.itemconfig(facelet_id[f][row][col], fill=cols[fc.f[idx]])
                 idx += 1
+
+
 ########################################################################################################################
 
 # ################################### Edit the facelet colors ##########################################################
@@ -158,41 +168,54 @@ def click(event):
             canvas.itemconfig("current", width=5)
         else:
             canvas.itemconfig("current", fill=curcol)
+
+
 ########################################################################################################################
 
 
+# ######################################### functions to set the slider values #########################################
 def set_rgb_L(val):
     vision_params.rgb_L = int(val)
+
 
 def set_orange_L(val):
     vision_params.orange_L = int(val)
 
+
 def set_orange_H(val):
     vision_params.orange_H = int(val)
+
 
 def set_yellow_H(val):
     vision_params.yellow_H = int(val)
 
+
 def set_green_H(val):
     vision_params.green_H = int(val)
+
 
 def set_blue_H(val):
     vision_params.blue_H = int(val)
 
+
 def set_sat_W(val):
     vision_params.sat_W = int(val)
+
 
 def set_val_W(val):
     vision_params.val_W = int(val)
 
+
 def set_sigma_C(val):
     vision_params.sigma_C = int(val)
+
 
 def set_delta_C(val):
     vision_params.delta_C = int(val)
 
 
 def transfer():
+    """ Transfer the facelet colors detected by the opencv vision to the GUI editor """
     centercol = vision_params.fc[1][1]
     dc = {}
     for i in range(6):
@@ -201,6 +224,8 @@ def transfer():
         for j in range(3):
             canvas.itemconfig(facelet_id[dc[centercol]][i][j], fill=vision_params.fc[i][j])
 
+
+# ######################################################################################################################
 
 #  ###################################### Generate and display the TK_widgets ##########################################
 
@@ -230,52 +255,59 @@ canvas.bind("<Button-1>", click)
 create_facelet_rects(width)
 create_colorpick_rects(width)
 
-
-s_orange_L = Scale(root, from_=1, to=14, length=width*1.4, showvalue=0, label='red-orange', orient=HORIZONTAL, command=set_orange_L)
+s_orange_L = Scale(root, from_=1, to=14, length=width * 1.4, showvalue=0, label='red-orange', orient=HORIZONTAL,
+                   command=set_orange_L)
 canvas.create_window(10, 12 + 6.0 * width, anchor=NW, window=s_orange_L)
 s_orange_L.set(vision_params.orange_L)
 
-s_orange_H = Scale(root, from_=8, to=40, length=width*1.4, showvalue=0, label='orange-yellow', orient=HORIZONTAL, command=set_orange_H)
+s_orange_H = Scale(root, from_=8, to=40, length=width * 1.4, showvalue=0, label='orange-yellow', orient=HORIZONTAL,
+                   command=set_orange_H)
 canvas.create_window(10, 12 + 6.6 * width, anchor=NW, window=s_orange_H)
 s_orange_H.set(vision_params.orange_H)
 
-s_yellow_H = Scale(root, from_=31, to=80, length=width*1.4, showvalue=0, label='yellow-green', orient=HORIZONTAL, command=set_yellow_H)
+s_yellow_H = Scale(root, from_=31, to=80, length=width * 1.4, showvalue=0, label='yellow-green', orient=HORIZONTAL,
+                   command=set_yellow_H)
 canvas.create_window(10, 12 + 7.2 * width, anchor=NW, window=s_yellow_H)
 s_yellow_H.set(vision_params.yellow_H)
 
-s_green_H = Scale(root, from_=70, to=120, length=width*1.4, showvalue=0, label='green-blue', orient=HORIZONTAL, command=set_green_H)
+s_green_H = Scale(root, from_=70, to=120, length=width * 1.4, showvalue=0, label='green-blue', orient=HORIZONTAL,
+                  command=set_green_H)
 canvas.create_window(10, 12 + 7.8 * width, anchor=NW, window=s_green_H)
 s_green_H.set(vision_params.green_H)
 
-s_blue_H = Scale(root, from_=120, to=180, length=width*1.4, showvalue=0, label='blue-red', orient=HORIZONTAL, command=set_blue_H)
+s_blue_H = Scale(root, from_=120, to=180, length=width * 1.4, showvalue=0, label='blue-red', orient=HORIZONTAL,
+                 command=set_blue_H)
 canvas.create_window(10, 12 + 8.4 * width, anchor=NW, window=s_blue_H)
 s_blue_H.set(vision_params.blue_H)
 
-s_rgb_L = Scale(root, from_=10, to=130, length=width*1.4, showvalue=0, label='black-filter', orient=HORIZONTAL, command=set_rgb_L)
-canvas.create_window(10+width*1.5, 12 + 6 * width, anchor=NW, window=s_rgb_L)
+s_rgb_L = Scale(root, from_=10, to=130, length=width * 1.4, showvalue=0, label='black-filter', orient=HORIZONTAL,
+                command=set_rgb_L)
+canvas.create_window(10 + width * 1.5, 12 + 6 * width, anchor=NW, window=s_rgb_L)
 s_rgb_L.set(vision_params.rgb_L)
 
-s_sat_W = Scale(root, from_=120, to=0, length=width*1.4, showvalue=0, label='white-filter s', orient=HORIZONTAL, command=set_sat_W)
-canvas.create_window(10+width*1.5, 12 + 6.6 * width, anchor=NW, window=s_sat_W)
+s_sat_W = Scale(root, from_=120, to=0, length=width * 1.4, showvalue=0, label='white-filter s', orient=HORIZONTAL,
+                command=set_sat_W)
+canvas.create_window(10 + width * 1.5, 12 + 6.6 * width, anchor=NW, window=s_sat_W)
 s_sat_W.set(vision_params.sat_W)
 
-s_val_W = Scale(root, from_=80, to=255, length=width*1.4, showvalue=0, label='white-filter v', orient=HORIZONTAL, command=set_val_W)
-canvas.create_window(10+width*1.5, 12 + 7.2 * width, anchor=NW, window=s_val_W)
+s_val_W = Scale(root, from_=80, to=255, length=width * 1.4, showvalue=0, label='white-filter v', orient=HORIZONTAL,
+                command=set_val_W)
+canvas.create_window(10 + width * 1.5, 12 + 7.2 * width, anchor=NW, window=s_val_W)
 s_val_W.set(vision_params.val_W)
 
-s_sigma_C = Scale(root, from_=30, to=0, length=width*1.4, showvalue=0, label='color-filter \u03c3', orient=HORIZONTAL, command=set_sigma_C)
-canvas.create_window(10+width*1.5, 12 + 7.8 * width, anchor=NW, window=s_sigma_C)
+s_sigma_C = Scale(root, from_=30, to=0, length=width * 1.4, showvalue=0, label='color-filter \u03c3', orient=HORIZONTAL,
+                  command=set_sigma_C)
+canvas.create_window(10 + width * 1.5, 12 + 7.8 * width, anchor=NW, window=s_sigma_C)
 s_sigma_C.set(vision_params.sigma_C)
 
-s_delta_C = Scale(root, from_=10, to=0, length=width*1.4, showvalue=0, label='color-filter \u03b4', orient=HORIZONTAL, command=set_delta_C)
-canvas.create_window(10+width*1.5, 12 + 8.4 * width, anchor=NW, window=s_delta_C)
+s_delta_C = Scale(root, from_=10, to=0, length=width * 1.4, showvalue=0, label='color-filter \u03b4', orient=HORIZONTAL,
+                  command=set_delta_C)
+canvas.create_window(10 + width * 1.5, 12 + 8.4 * width, anchor=NW, window=s_delta_C)
 s_delta_C.set(vision_params.delta_C)
 
-btransfer = Button(text="Apply webcam colors", height=2, width=20, relief=RAISED, command=transfer)
+btransfer = Button(text="Import webcam colors", height=2, width=20, relief=RAISED, command=transfer)
 canvas.create_window(10 + 0.1 * width, 10 + 2.1 * width, anchor=NW, window=btransfer)
 
 root.mainloop()
 
-
 ########################################################################################################################
-

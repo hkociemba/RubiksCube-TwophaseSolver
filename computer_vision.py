@@ -1,3 +1,5 @@
+# ############################## Start the webserver, the opencv color grabber and the GUI #############################
+
 import start_server
 from threading import Thread
 from vision2 import grab_colors

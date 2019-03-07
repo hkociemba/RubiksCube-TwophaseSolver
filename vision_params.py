@@ -1,16 +1,24 @@
-# ############################ Computer vision parameters #####################################################
+# #################################### Computer vision parameters #####################################################
 
-rgb_L = 50  #
+# The parameters are used by functions in vision2.py and can be changed from the GUI client_gui.py
 
-sigma_W = 300  # This parameter cannot be changed in the GUI
+# default values for the parameters
 
-# default values for parameters
-sat_W = 60  # maximum allowed saturation for white
-val_W = 150  # minimum allowed value for white
+# black-filter
+rgb_L = 50  # threshold for r, g and b values. rgb-pixels with r,g,b< rgb_L are consider to be no facelet-pixel
 
-sigma_C = 5  # maximum allowed hue standard deviation for a grid square to be considered as part of a facelet
+# white-filter
+sat_W = 60  # hsv-pixels with a saturation s > sat_W are considered not to be a white facelet-pixel
+val_W = 150  # hsv-pixels with a value v < sat_W are considered not to be a white facelet-pixel
+
+# this parameter cannot be changed by the GUI
+sigma_W = 300  # a grid square is considered part of a white facelet if the standard deviation of the hue is <= sigma_W
+
+# color-filter
+sigma_C = 5  # a grid square is considered part of a facelet if the standard deviation of the hue is <= sigma_C
 delta_C = 5  # pixels within the interval [hue-delta,hue+delta] are considered to belong to the same facelet
 
+# these parameters depend on the actually used cube colors and the lightning conditions
 orange_L = 6  # lowest allowed hue for color orange
 orange_H = 23  # highest allowed hue for color orange
 yellow_H = 50  # highest allowed hue for color yellow
@@ -18,6 +26,5 @@ green_H = 100  # highest allowed hue for color green
 blue_H = 160  # highest allowed hue for color blue
 # hue values > blue_H and < orange_L describe the color red
 
-
+# the colors of the cube are stored here
 fc = [['red', 'red', 'red'], ['red', 'red', 'red'], ['red', 'red', 'red']]
-

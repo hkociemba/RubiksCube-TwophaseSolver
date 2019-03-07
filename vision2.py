@@ -1,24 +1,17 @@
-# pip install opencv_python-3.2.0-cp36-cp36m-win_amd64.whl
+# ######################## analyse the webcam input and retrieve the facelet colors of a single cube face ##############
 
+
+# pip install opencv_python-3.2.0-cp36-cp36m-win_amd64.whl
 
 import cv2
 import numpy as np
-import time
 import vision_params
 
-
-sigma_W = 300  # 10-300
-#sat_W_max = 60  # 60
-#val_W_min = 150  # 120
-
-#sigma_C = 3  # 5
-#delta_C = 5  # 5
-
-
-grid_N = 25
+grid_N = 25  # number of grid-squares in vertical direction
 
 
 def drawgrid(img, n):
+    """draw grid onto the webcam output. Only used for debugging purposes."""
     h, w = img.shape[:2]
     sz = h // n
     border = 1 * sz
@@ -29,13 +22,15 @@ def drawgrid(img, n):
 
 
 def del_duplicates(pts):
+    """if two potential facelet centers stored in pts are too close together, one of them is deleted"""
+    delta = width/12  # width is defined global in grabcolors()
     dele = True
     while dele:
         dele = False
         r = range(len(pts))
         for i in r:
             for j in r[i + 1:]:
-                if np.linalg.norm(pts[i] - pts[j]) < 20:
+                if np.linalg.norm(pts[i] - pts[j]) < delta:
                     del pts[j]
                     dele = True
                 if dele:
@@ -45,6 +40,8 @@ def del_duplicates(pts):
 
 
 def medoid(pts):
+    """ The mediod is the point with the smallest summed distance from the other points.
+    This is a candidate for the center facelet."""
     res = np.array([0.0, 0.0])
     smin = 100000
     for i in pts:
@@ -59,7 +56,7 @@ def medoid(pts):
 
 
 def facelets(pts, med):
-    # pts sind alle erkannten facelets, m der Medoid
+    """Separate the candidates into edge and corner facelets by their distance from the medoid."""
     ed = []
     co = []
     if med[0] == 0:
@@ -83,8 +80,9 @@ def facelets(pts, med):
     return co, ed
 
 
-def antifacelets(co, ed, med):
-    global width
+def mirr_facelet(co, ed, med):
+    """If we have detected a facelet position, the point reflection at the center also gives a facelet position.
+     We can use this position in case the other facelet was not detected directly."""
     aef = []
     acf = []
     for p in ed:
@@ -95,7 +93,7 @@ def antifacelets(co, ed, med):
         acf.append(pa)
 
     # delete duplicates
-    delta = width / 12
+    delta = width / 12  # width is defined global in grabcolors()
     for k in range(len(aef) - 1, -1, -1):
         for p in ed:
             if np.linalg.norm(aef[k] - p) < delta:
@@ -111,16 +109,22 @@ def antifacelets(co, ed, med):
     return acf, aef
 
 
-def showcolor(bgrcap, p):
+def display_colorname(bgrcap, p):
+    """ Display the colornames on the webcam picture"""
     p = p.astype(np.uint16)
     col = getcolor(p)
+    if col in('blue', 'green', 'red'):
+        txtcol = (255, 255, 255)
+    else:
+        txtcol = (0, 0, 0)
     font = cv2.FONT_HERSHEY_SIMPLEX
     tz = cv2.getTextSize(col, font, 0.4, 1)[0]
     cv2.putText(
-        bgrcap, getcolor(p), tuple(p - (tz[0]//2, -tz[1]//2)), font, 0.4, (0, 0, 0), 1)
+        bgrcap, getcolor(p), tuple(p - (tz[0]//2, -tz[1]//2)), font, 0.4, txtcol, 1)
 
 
 def getcolor(p):
+    """ Decide the color of a facelet by its h value (non white) or by s and v (white)"""
     sz = 10
     p = p.astype(np.uint16)
     rect = hsv[p[1] - sz:p[1] + sz, p[0] - sz:p[0] + sz]
@@ -140,13 +144,14 @@ def getcolor(p):
         return 'red'
 
 
-def getcolors(bgrcap, co, ed, aco, aed, m):
+def getcolors(co, ed, aco, aed, m):
+    """Find the colors of the 9 facelets and decide their position on the cube face"""
     centers = [[m for y in range(3)] for x in range(3)]
     colors = [['red' for y in range(3)] for x in range(3)]
     cocents = co + aco
     if len(cocents) != 4:
         return []
-    edcents =  ed + aed
+    edcents = ed + aed
     if len(edcents) != 4:
         return
     for i in cocents:
@@ -171,7 +176,6 @@ def getcolors(bgrcap, co, ed, aco, aed, m):
     for i in edcents:
         if i[1] > centers[2][1][1]:
             centers[2][1] = i
-    #cv2.circle(bgrcap, tuple(centers[2][1].astype(np.uint16)), 8, (128, 128, 128), -1)
     for x in range(3):
         for y in range(3):
             colors[x][y] = getcolor(centers[x][y])
@@ -179,12 +183,12 @@ def getcolors(bgrcap, co, ed, aco, aed, m):
 
 
 def find_squares(bgrcap, n):
+    """ Find the positions of squares in the webcam picture"""
     global r_mask, color_filter, white_filter, black_filter
 
     h, s, v = cv2.split(hsv)
     h_sqr = np.square(h)
 
-    bgr = bgrcap.astype(float)
     sz = height // n
     border = 1 * sz
 
@@ -206,16 +210,13 @@ def find_squares(bgrcap, n):
 
             delta = vision_params.delta_C
 
-            if sigma < sigma_W:  # sigma liegt für weiß höher, 10-100
+            if sigma < vision_params.sigma_W:  # sigma liegt für weiß höher, 10-100
 
                 ex_rect = hsv[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz].copy()  # warum copy?
                 r_mask = cv2.inRange(ex_rect, (0, 0, vision_params.val_W),
                                      (255, vision_params.sat_W, 255))  # saturation high 30, value low 180
                 r_mask = cv2.bitwise_or(r_mask, white_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
                 white_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = r_mask
-
-            # else:
-            #     continue
 
             if sigma < vision_params.sigma_C:  # übrigen echten Farben  1-3
                 ex_rect = h[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz].copy()  # warum copy?
@@ -234,7 +235,7 @@ def find_squares(bgrcap, n):
             # else:
             #     continue
 
-    black_filter = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))  # wichtiger parameter 30-50
+    black_filter = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))
     black_filter = cv2.bitwise_not(black_filter)
 
     color_filter = cv2.bitwise_and(color_filter, black_filter)
@@ -269,6 +270,7 @@ def find_squares(bgrcap, n):
 
 
 def grab_colors():
+    """Find the cube in the webcam picture and grab the colors of the facelets"""
     global cent, width, height, hsv, color_filter, white_filter
     cap = cv2.VideoCapture(0)
     _, bgrcap = cap.read()
@@ -288,24 +290,23 @@ def grab_colors():
         cent = []
         find_squares(bgrcap, grid_N)
         del_duplicates(cent)
-        # for i in cent:
-        #     cv2.circle(bgrcap, txple(i.astype(np.uint16)), 5, (128, 128, 128), -1)
+
         m = medoid(cent)
 
         cf, ef = facelets(cent, m)
-        acf, aef = antifacelets(cf, ef, m)
+        acf, aef = mirr_facelet(cf, ef, m)
 
-        showcolor(bgrcap, m)
+        display_colorname(bgrcap, m)
         for i in ef:
-            showcolor(bgrcap, i)
+            display_colorname(bgrcap, i)
         for i in cf:
-            showcolor(bgrcap, i)
+            display_colorname(bgrcap, i)
         for i in aef:
-            showcolor(bgrcap, i)
+            display_colorname(bgrcap, i)
         for i in acf:
-            showcolor(bgrcap, i)
+            display_colorname(bgrcap, i)
 
-        vision_params.fc = getcolors(bgrcap, cf, ef, acf, aef, m)
+        vision_params.fc = getcolors(cf, ef, acf, aef, m)
 
         # drawgrid(bgrcap, grid_N)
         cv2.imshow('color_filter', cv2.resize(color_filter, (width // 2, height // 2)))
@@ -317,5 +318,5 @@ def grab_colors():
         if k == 120:  # x
             break
 
-#grab_colors()
+
 cv2.destroyAllWindows()
