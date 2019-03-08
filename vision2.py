@@ -246,7 +246,7 @@ def find_squares(bgrcap, n):
     white_filter = cv2.blur(white_filter, (20, 20))
     white_filter = cv2.inRange(white_filter, 240, 255)
 
-    itr = iter([color_filter, white_filter])
+    itr = iter([white_filter, color_filter])  # apply white filter first!
 
     for j in itr:
         im2, contours, hierarchy = cv2.findContours(j, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
