@@ -222,8 +222,8 @@ def solve(cubestring, max_length=20, timeout=3):
     solutions = []
     terminated = thr.Event()
     terminated.clear()
-    syms = cc.symmetries();
-    if len(list(set([16, 20, 24, 28]) & set(syms))) > 0:  # we have some rotational symmetry along a long diagonal
+    syms = cc.symmetries()
+    if len(list({16, 20, 24, 28} & set(syms))) > 0:  # we have some rotational symmetry along a long diagonal
         tr = [0, 3]  # so we search only one direction and the inverse
     else:
         tr = range(6)  # This means search in 3 directions + inverse cube

@@ -21,6 +21,7 @@ class CoordCube:
     In phase 1 a state is uniquely determined by the three coordinates flip, twist and slice.
     In phase 2 a state is uniquely determined by the three coordinates corners, ud_edges and slice_sorted.
     """
+
     def __init__(self, cc=None):
         if cc is None:
             self.twist = SOLVED  # twist of corners
@@ -54,8 +55,8 @@ class CoordCube:
             self.corner_rep = sy.corner_rep[self.corner_classidx]
 
     def __str__(self):
-        s = '(twist: ' + str(self.twist) + ', flip: ' + str(self.flip) + ', slice: ' + str(self.slice_sorted//24) +\
-         ', U-edges: ' + str(self.u_edges) + ', D-edges: ' + str(self.d_edges) + ', E-edges: '\
+        s = '(twist: ' + str(self.twist) + ', flip: ' + str(self.flip) + ', slice: ' + str(self.slice_sorted // 24) + \
+            ', U-edges: ' + str(self.u_edges) + ', D-edges: ' + str(self.d_edges) + ', E-edges: ' \
             + str(self.slice_sorted) + ', Corners: ' + str(self.corners) + ', UD-Edges : ' + str(self.ud_edges) + ')'
         s = s + '\n' + str(self.flipslice_classidx) + ' ' + str(self.flipslice_sym) + ' ' + str(self.flipslice_rep)
         s = s + '\n' + str(self.corner_classidx) + ' ' + str(self.corner_sym) + ' ' + str(self.corner_rep)
@@ -103,7 +104,8 @@ class CoordCube:
                 flipslice1 = N_FLIP * slice1 + flip1
                 classidx1 = sy.flipslice_classidx[flipslice1]
                 sym = sy.flipslice_sym[flipslice1]
-                if pr.get_flipslice_twist_depth3(N_TWIST * classidx1 + sy.twist_conj[(twist1 << 4) + sym]) == depth_mod3 - 1:
+                if pr.get_flipslice_twist_depth3(
+                        N_TWIST * classidx1 + sy.twist_conj[(twist1 << 4) + sym]) == depth_mod3 - 1:
                     depth += 1
                     twist = twist1
                     flip = flip1
@@ -131,7 +133,7 @@ class CoordCube:
                 ud_edges1 = mv.ud_edges_move[N_MOVE * ud_edges + m]
                 classidx1 = sy.corner_classidx[corners1]
                 sym = sy.corner_sym[corners1]
-                if pr.get_corners_ud_edges_depth3(N_UD_EDGES * classidx1 + sy.ud_edges_conj[(ud_edges1 << 4) + sym]) ==\
+                if pr.get_corners_ud_edges_depth3(N_UD_EDGES * classidx1 + sy.ud_edges_conj[(ud_edges1 << 4) + sym]) == \
                         depth_mod3 - 1:
                     depth += 1
                     corners = corners1
@@ -191,6 +193,9 @@ def create_phase2_edgemerge_table():
         fh = open(fname, "rb")
         u_edges_plus_d_edges_to_ud_edges = ar.array('H')
         u_edges_plus_d_edges_to_ud_edges.fromfile(fh, N_U_EDGES_PHASE2 * N_PERM_4)
+
+
 ########################################################################################################################
+
 
 create_phase2_edgemerge_table()

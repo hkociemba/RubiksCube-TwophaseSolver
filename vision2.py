@@ -112,7 +112,7 @@ def mirr_facelet(co, ed, med):
 def display_colorname(bgrcap, p):
     """ Display the colornames on the webcam picture"""
     p = p.astype(np.uint16)
-    col = getcolor(p)
+    _, col = getcolor(p)
     if col in('blue', 'green', 'red'):
         txtcol = (255, 255, 255)
     else:
@@ -120,7 +120,7 @@ def display_colorname(bgrcap, p):
     font = cv2.FONT_HERSHEY_SIMPLEX
     tz = cv2.getTextSize(col, font, 0.4, 1)[0]
     cv2.putText(
-        bgrcap, getcolor(p), tuple(p - (tz[0]//2, -tz[1]//2)), font, 0.4, txtcol, 1)
+        bgrcap, col, tuple(p - (tz[0]//2, -tz[1]//2)), font, 0.4, txtcol, 1)
 
 
 def getcolor(p):
@@ -130,30 +130,32 @@ def getcolor(p):
     rect = hsv[p[1] - sz:p[1] + sz, p[0] - sz:p[0] + sz]
     median = np.sum(rect, axis=(0, 1)) / sz / sz / 4
     mh, ms, mv = median
-    if ms < vision_params.sat_W and mv > vision_params.val_W:
-        return 'white'
+    if ms <= vision_params.sat_W and mv >= vision_params.val_W:
+        return median, 'white'
     elif vision_params.orange_L <= mh < vision_params.orange_H:
-        return 'orange'
+        return median, 'orange'
     elif vision_params.orange_H <= mh < vision_params.yellow_H:
-        return 'yellow'
+        return median, 'yellow'
     elif vision_params.yellow_H <= mh < vision_params.green_H:
-        return 'green'
+        return median, 'green'
     elif vision_params.green_H <= mh < vision_params.blue_H:
-        return 'blue'
+        return median, 'blue'
     else:
-        return 'red'
+        return median, 'red'
 
 
 def getcolors(co, ed, aco, aed, m):
     """Find the colors of the 9 facelets and decide their position on the cube face"""
-    centers = [[m for y in range(3)] for x in range(3)]
-    colors = [['red' for y in range(3)] for x in range(3)]
+    centers = [[m for x in range(3)] for x in range(3)]
+    colors = [['' for x in range(3)] for x in range(3)]
+    s = np.array([0., 0., 0.])
+    hsvs = [[s for x in range(3)] for x in range(3)]
     cocents = co + aco
     if len(cocents) != 4:
-        return []
+        return [], []
     edcents = ed + aed
     if len(edcents) != 4:
-        return
+        return [], []
     for i in cocents:
         if i[0] < m[0] and i[1] < m[1]:
             centers[0][0] = i
@@ -178,8 +180,11 @@ def getcolors(co, ed, aco, aed, m):
             centers[2][1] = i
     for x in range(3):
         for y in range(3):
-            colors[x][y] = getcolor(centers[x][y])
-    return colors
+            hsv_, col = getcolor(centers[x][y])
+            colors[x][y] = col
+            hsvs[x][y] = hsv_
+
+    return hsvs, colors
 
 
 def find_squares(bgrcap, n):
@@ -264,7 +269,7 @@ def find_squares(bgrcap, n):
             edges_sq_mean = np.sum(np.square(edges)) / 4
             if edges_sq_mean - edges_mean_sq > varmax_edges:
                 continue
-            # cv2.drawContours(bgrcap, [approx], -1, (0, 0, 255), 8)
+            #cv2.drawContours(bgrcap, [approx], -1, (0, 0, 255), 8)
             middle = np.sum(corners, axis=0) / 4
             cent.append(np.asarray(middle))
 
@@ -306,7 +311,7 @@ def grab_colors():
         for i in acf:
             display_colorname(bgrcap, i)
 
-        vision_params.fc = getcolors(cf, ef, acf, aef, m)
+        vision_params.face_hsv, vision_params.face_col = getcolors(cf, ef, acf, aef, m)
 
         # drawgrid(bgrcap, grid_N)
         cv2.imshow('color_filter', cv2.resize(color_filter, (width // 2, height // 2)))

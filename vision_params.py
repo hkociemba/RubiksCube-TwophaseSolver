@@ -27,4 +27,7 @@ blue_H = 160  # highest allowed hue for color blue
 # hue values > blue_H and < orange_L describe the color red
 
 # the colors of the cube are stored here
-fc = [['red', 'red', 'red'], ['red', 'red', 'red'], ['red', 'red', 'red']]
+face_col = []  # the colors (as text) of a cube face are stored here
+face_hsv = []  # the colors (as hsv-values) of a cube face are stored here
+cube_col = {}  # the colors (as text) of the 6 faces
+cube_hsv = {}  # the colors (as hsv-values) o the 6 faces

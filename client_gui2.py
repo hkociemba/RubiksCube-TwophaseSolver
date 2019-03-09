@@ -11,6 +11,9 @@ from threading import Thread
 from vision2 import grab_colors
 import vision_params
 
+
+import numpy as np
+
 # ################################## some global variables and constants ###############################################
 DEFAULT_HOST = 'localhost'
 DEFAULT_PORT = '8080'
@@ -216,14 +219,54 @@ def set_delta_C(val):
 
 def transfer():
     """ Transfer the facelet colors detected by the opencv vision to the GUI editor """
-    centercol = vision_params.fc[1][1]
+    if len(vision_params.face_col) == 0:
+        return
+    centercol = vision_params.face_col[1][1]
+
+    vision_params.cube_col[centercol] = vision_params.face_col
+    vision_params.cube_hsv[centercol] = vision_params.face_hsv
+
     dc = {}
     for i in range(6):
-        dc[canvas.itemcget(facelet_id[i][1][1], "fill")] = i
+        dc[canvas.itemcget(facelet_id[i][1][1], "fill")] = i  # map color to face number
     for i in range(3):
         for j in range(3):
-            canvas.itemconfig(facelet_id[dc[centercol]][i][j], fill=vision_params.fc[i][j])
+            canvas.itemconfig(facelet_id[dc[centercol]][i][j], fill=vision_params.face_col[i][j])
 
+
+
+# def fix_red_orange():
+#     # red and orange can be wrongly assigned if the lighting conditions change during the webcam input
+#     # when all faces are read in we should have 18 red/orange facelets. The facelets with the lower saturations
+#     # are the orange facelets
+#     no = 0
+#     o_hsv = []
+#     itr = iter(['white', 'blue', 'green', 'yellow', 'orange', 'red'])
+#     dc = {}
+#     for i in range(6):
+#         dc[canvas.itemcget(facelet_id[i][1][1], "fill")] = i  # map color to face number
+#     for f in itr:
+#         for i in range(3):
+#             for j in range(3):
+#                 if f not in vision_params.cube_col:
+#                     return
+#                 if vision_params.cube_col[f][i][j] == 'orange' or vision_params.cube_col[f][i][j] == 'red' :
+#                     h, s, v = vision_params.cube_hsv[f][i][j]
+#                     o_hsv.append((s,f,i,j))
+#                     no += 1
+#     if no != 18:
+#         return
+#     o_hsv.sort()
+#     for k in range(9):
+#         f = o_hsv[k][1]
+#         i = o_hsv[k][2]
+#         j = o_hsv[k][3]
+#         canvas.itemconfig(facelet_id[dc[f]][i][j], fill='orange')
+#     for k in range(9, 18):
+#         f = o_hsv[k][1]
+#         i = o_hsv[k][2]
+#         j = o_hsv[k][3]
+#         canvas.itemconfig(facelet_id[dc[f]][i][j], fill='red')
 
 # ######################################################################################################################
 
@@ -305,8 +348,12 @@ s_delta_C = Scale(root, from_=10, to=0, length=width * 1.4, showvalue=0, label='
 canvas.create_window(10 + width * 1.5, 12 + 8.4 * width, anchor=NW, window=s_delta_C)
 s_delta_C.set(vision_params.delta_C)
 
-btransfer = Button(text="Import webcam colors", height=2, width=20, relief=RAISED, command=transfer)
-canvas.create_window(10 + 0.1 * width, 10 + 2.1 * width, anchor=NW, window=btransfer)
+btransfer = Button(text="Webcam import", height=2, width=13, relief=RAISED, command=transfer)
+canvas.create_window(10 + 0.5 * width, 10 + 2.1 * width, anchor=NW, window=btransfer)
+
+#bauto = Button(text="Fix colors", height=2, width=8, relief=RAISED, command=fix_red_orange)
+#canvas.create_window(10 + 1.8 * width, 10 + 2.1 * width, anchor=NW, window=bauto)
+
 
 root.mainloop()
 

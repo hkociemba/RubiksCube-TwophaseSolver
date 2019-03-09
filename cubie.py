@@ -546,6 +546,7 @@ basicMoveCube[Color.B] = CubieCube(cpB, coB, epB, eoB)
 ########################################################################################################################
 
 # ################################# these cubes represent the all 18 cube moves ########################################
+
 moveCube = [0] * 18
 for c1 in Color:
     cc = CubieCube()
