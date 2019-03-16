@@ -23,7 +23,7 @@ def drawgrid(img, n):
 
 def del_duplicates(pts):
     """if two potential facelet centers stored in pts are too close together, one of them is deleted"""
-    delta = width/12  # width is defined global in grabcolors()
+    delta = width / 12  # width is defined global in grabcolors()
     dele = True
     while dele:
         dele = False
@@ -113,14 +113,14 @@ def display_colorname(bgrcap, p):
     """ Display the colornames on the webcam picture"""
     p = p.astype(np.uint16)
     _, col = getcolor(p)
-    if col in('blue', 'green', 'red'):
+    if col in ('blue', 'green', 'red'):
         txtcol = (255, 255, 255)
     else:
         txtcol = (0, 0, 0)
     font = cv2.FONT_HERSHEY_SIMPLEX
     tz = cv2.getTextSize(col, font, 0.4, 1)[0]
     cv2.putText(
-        bgrcap, col, tuple(p - (tz[0]//2, -tz[1]//2)), font, 0.4, txtcol, 1)
+        bgrcap, col, tuple(p - (tz[0] // 2, -tz[1] // 2)), font, 0.4, txtcol, 1)
 
 
 def getcolor(p):
@@ -189,7 +189,7 @@ def getcolors(co, ed, aco, aed, m):
 
 def find_squares(bgrcap, n):
     """ Find the positions of squares in the webcam picture"""
-    global r_mask, color_filter, white_filter, black_filter
+    global mask, color_mask, white_mask, black_mask
 
     h, s, v = cv2.split(hsv)
     h_sqr = np.square(h)
@@ -197,61 +197,65 @@ def find_squares(bgrcap, n):
     sz = height // n
     border = 1 * sz
 
-    varmax_edges = 20  # wichtig
+    varmax_edges = 20
     for y in range(border, height - border, sz):
         for x in range(border, width - border, sz):
 
-            # rect_h = h[y:y + sz, x:x + sz]
             rect_h = h[y:y + sz, x:x + sz]
             rect_h_sqr = h_sqr[y:y + sz, x:x + sz]
 
             median_h = np.sum(rect_h) / sz / sz
 
-            sqr_median_hf = median_h * median_h
-            median_hf_sqr = np.sum(rect_h_sqr) / sz / sz
-            var = median_hf_sqr - sqr_median_hf
+            sqr_median_h = median_h * median_h
+            median_h_sqr = np.sum(rect_h_sqr) / sz / sz
+            var = median_h_sqr - sqr_median_h
 
             sigma = np.sqrt(var)
 
             delta = vision_params.delta_C
 
-            if sigma < vision_params.sigma_W:  # sigma liegt für weiß höher, 10-100
+            if sigma < vision_params.sigma_W:
+                rect3x3 = hsv[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz]
+                mask = cv2.inRange(rect3x3, (0, 0, vision_params.val_W),
+                                   (255, vision_params.sat_W, 255))
+                # mask = cv2.bitwise_or(mask, white_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
+                # white_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = mask
 
-                ex_rect = hsv[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz].copy()  # warum copy?
-                r_mask = cv2.inRange(ex_rect, (0, 0, vision_params.val_W),
-                                     (255, vision_params.sat_W, 255))  # saturation high 30, value low 180
-                r_mask = cv2.bitwise_or(r_mask, white_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
-                white_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = r_mask
+            white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
+                cv2.bitwise_or(mask, white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
 
-            if sigma < vision_params.sigma_C:  # übrigen echten Farben  1-3
-                ex_rect = h[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz].copy()  # warum copy?
+            if sigma < vision_params.sigma_C:
+                rect3x3 = h[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz]
                 if median_h + delta >= 180:
-                    r_mask = cv2.inRange(ex_rect, 0, median_h + delta - 180)
-                    r_mask = cv2.bitwise_or(r_mask, cv2.inRange(ex_rect, median_h - delta, 180))
+                    mask = cv2.inRange(rect3x3, 0, median_h + delta - 180)
+                    mask = cv2.bitwise_or(mask, cv2.inRange(rect3x3, median_h - delta, 180))
                 elif median_h - delta < 0:
-                    r_mask = cv2.inRange(ex_rect, median_h - delta + 180, 180)
-                    r_mask = cv2.bitwise_or(r_mask, cv2.inRange(ex_rect, 0, median_h + delta))
+                    mask = cv2.inRange(rect3x3, median_h - delta + 180, 180)
+                    mask = cv2.bitwise_or(mask, cv2.inRange(rect3x3, 0, median_h + delta))
                 else:
-                    r_mask = cv2.inRange(ex_rect, median_h - delta, median_h + delta)
+                    mask = cv2.inRange(rect3x3, median_h - delta, median_h + delta)
 
-                r_mask = cv2.bitwise_or(r_mask, color_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
-                color_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = r_mask
+                # mask = cv2.bitwise_or(mask, color_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
+                # color_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = mask
+
+                color_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
+                    cv2.bitwise_or(mask, color_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
 
             # else:
             #     continue
 
-    black_filter = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))
-    black_filter = cv2.bitwise_not(black_filter)
+    black_mask = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))
+    black_mask = cv2.bitwise_not(black_mask)
 
-    color_filter = cv2.bitwise_and(color_filter, black_filter)
-    color_filter = cv2.blur(color_filter, (20, 20))
-    color_filter = cv2.inRange(color_filter, 240, 255)
+    color_mask = cv2.bitwise_and(color_mask, black_mask)
+    color_mask = cv2.blur(color_mask, (20, 20))
+    color_mask = cv2.inRange(color_mask, 240, 255)
 
-    white_filter = cv2.bitwise_and(white_filter, black_filter)
-    white_filter = cv2.blur(white_filter, (20, 20))
-    white_filter = cv2.inRange(white_filter, 240, 255)
+    white_mask = cv2.bitwise_and(white_mask, black_mask)
+    white_mask = cv2.blur(white_mask, (20, 20))
+    white_mask = cv2.inRange(white_mask, 240, 255)
 
-    itr = iter([white_filter, color_filter])  # apply white filter first!
+    itr = iter([white_mask, color_mask])  # apply white filter first!
 
     for j in itr:
         im2, contours, hierarchy = cv2.findContours(j, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -269,18 +273,19 @@ def find_squares(bgrcap, n):
             edges_sq_mean = np.sum(np.square(edges)) / 4
             if edges_sq_mean - edges_mean_sq > varmax_edges:
                 continue
-            #cv2.drawContours(bgrcap, [approx], -1, (0, 0, 255), 8)
+            # cv2.drawContours(bgrcap, [approx], -1, (0, 0, 255), 8)
             middle = np.sum(corners, axis=0) / 4
             cent.append(np.asarray(middle))
 
 
 def grab_colors():
     """Find the cube in the webcam picture and grab the colors of the facelets"""
-    global cent, width, height, hsv, color_filter, white_filter
+    global cent, width, height, hsv, color_mask, white_mask
     cap = cv2.VideoCapture(0)
     _, bgrcap = cap.read()
     if bgrcap is None:
         print('Cannot connect to webcam!')
+        print('If you use a Raspberry Pi and no USB-webcam you have to run "sudo modprobe bvm2835-v4l2" first!')
         return
     height, width = bgrcap.shape[:2]
     while 1:
@@ -288,9 +293,17 @@ def grab_colors():
         # Take each frame
         _, bgrcap = cap.read()  #
         bgrcap = cv2.blur(bgrcap, (5, 5))
-        hsv = cv2.cvtColor(bgrcap, cv2.COLOR_BGR2HSV).astype(float)
-        color_filter = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # mask for colors
-        white_filter = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # special mask for white
+
+        # now set all hue values >160 to 0. This is important since the color red often contains hue values
+        # in this range *and* also hue values >0 and else we get a mess when we compute mean and variance
+        hsv = cv2.cvtColor(bgrcap, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)  #
+        h_mask = cv2.inRange(h, 0, 160)
+        h = cv2.bitwise_and(h, h, mask=h_mask)
+        hsv = cv2.merge((h, s, v)).astype(float)
+
+        color_mask = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # mask for colors
+        white_mask = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # special mask for white
 
         cent = []
         find_squares(bgrcap, grid_N)
@@ -314,9 +327,9 @@ def grab_colors():
         vision_params.face_hsv, vision_params.face_col = getcolors(cf, ef, acf, aef, m)
 
         # drawgrid(bgrcap, grid_N)
-        cv2.imshow('color_filter', cv2.resize(color_filter, (width // 2, height // 2)))
-        cv2.imshow('white_filter', cv2.resize(white_filter, (width // 2, height // 2)))
-        cv2.imshow('black_filter', cv2.resize(black_filter, (width // 2, height // 2)))
+        cv2.imshow('color_filter', cv2.resize(color_mask, (width // 2, height // 2)))
+        cv2.imshow('white_filter', cv2.resize(white_mask, (width // 2, height // 2)))
+        cv2.imshow('black_filter', cv2.resize(black_mask, (width // 2, height // 2)))
         cv2.imshow('Webcam - type "x" to quit.', bgrcap)
 
         k = cv2.waitKey(5) & 0xFF

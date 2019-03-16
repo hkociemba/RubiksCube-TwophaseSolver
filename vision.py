@@ -144,7 +144,7 @@ def getcolor(p):
 
 
 def find_squares(n):
-    global hsv, r_mask, color_filter, white_filter, black_filter
+    global hsv, r_mask, color_mask, white_mask, black_filter
 
     h, s, v = cv2.split(hsv)
     h_sqr = np.square(h)
@@ -237,8 +237,8 @@ while 1:
     height, width = bgrcap.shape[:2]
     bgrcap = cv2.blur(bgrcap, (5, 5))
     hsv = cv2.cvtColor(bgrcap, cv2.COLOR_BGR2HSV).astype(float)
-    color_filter = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # mask for colors
-    white_filter = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # special mask for white
+    color_mask = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # mask for colors
+    white_mask = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # special mask for white
 
     cent = []
     find_squares(grid_N)
@@ -261,8 +261,8 @@ while 1:
         getcolor(i)
 
     # drawgrid(bgrcap, grid_N)
-    cv2.imshow('mask', cv2.resize(color_filter, (width // 2, height // 2)))
-    cv2.imshow('white_filter', cv2.resize(white_filter, (width // 2, height // 2)))
+    cv2.imshow('mask', cv2.resize(color_mask, (width // 2, height // 2)))
+    cv2.imshow('white_filter', cv2.resize(white_mask, (width // 2, height // 2)))
     cv2.imshow('black_filter', cv2.resize(black_filter, (width // 2, height // 2)))
     cv2.imshow('bgr', bgrcap)
 
