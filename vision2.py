@@ -198,32 +198,32 @@ def find_squares(bgrcap, n):
     border = 1 * sz
 
     varmax_edges = 20
+
+    # iterate all grid squares
     for y in range(border, height - border, sz):
         for x in range(border, width - border, sz):
 
+            # compute the standard deviation sigma of the hue in the square
             rect_h = h[y:y + sz, x:x + sz]
             rect_h_sqr = h_sqr[y:y + sz, x:x + sz]
-
             median_h = np.sum(rect_h) / sz / sz
-
             sqr_median_h = median_h * median_h
             median_h_sqr = np.sum(rect_h_sqr) / sz / sz
             var = median_h_sqr - sqr_median_h
-
             sigma = np.sqrt(var)
 
             delta = vision_params.delta_C
 
+            # if sigma is small enough define a mask on the 3x3 square with the grid square in it's center
             if sigma < vision_params.sigma_W:
                 rect3x3 = hsv[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz]
                 mask = cv2.inRange(rect3x3, (0, 0, vision_params.val_W),
                                    (255, vision_params.sat_W, 255))
-                # mask = cv2.bitwise_or(mask, white_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
-                # white_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = mask
-
+            # and OR it to the white_mask
             white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
                 cv2.bitwise_or(mask, white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
 
+            # similar procedure for the color mask. Some issues because hues are computet modulo 180
             if sigma < vision_params.sigma_C:
                 rect3x3 = h[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz]
                 if median_h + delta >= 180:
@@ -234,15 +234,8 @@ def find_squares(bgrcap, n):
                     mask = cv2.bitwise_or(mask, cv2.inRange(rect3x3, 0, median_h + delta))
                 else:
                     mask = cv2.inRange(rect3x3, median_h - delta, median_h + delta)
-
-                # mask = cv2.bitwise_or(mask, color_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
-                # color_filter[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = mask
-
                 color_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
                     cv2.bitwise_or(mask, color_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
-
-            # else:
-            #     continue
 
     black_mask = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))
     black_mask = cv2.bitwise_not(black_mask)
@@ -257,14 +250,18 @@ def find_squares(bgrcap, n):
 
     itr = iter([white_mask, color_mask])  # apply white filter first!
 
+    # search for squares in the white_mask and in the color_mask
     for j in itr:
+        # find contours
         im2, contours, hierarchy = cv2.findContours(j, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for n in range(len(contours)):
             approx = cv2.approxPolyDP(contours[n], sz // 2, True)
+            # if the contour cannot be approximated by a quadrangle it is not a facelet square
             if approx.shape[0] < 4 or approx.shape[0] > 4:
                 continue
-            corners = approx[:, 0]
+            corners = approx[:, 0]  # get the corners of the potential facelet square
 
+            # the edges of the square should have all about the same length
             edges = np.array(
                 [cv2.norm(corners[0] - corners[1], cv2.NORM_L2), cv2.norm(corners[1] - corners[2], cv2.NORM_L2),
                  cv2.norm(corners[2] - corners[3], cv2.NORM_L2),
@@ -273,8 +270,9 @@ def find_squares(bgrcap, n):
             edges_sq_mean = np.sum(np.square(edges)) / 4
             if edges_sq_mean - edges_mean_sq > varmax_edges:
                 continue
+
             # cv2.drawContours(bgrcap, [approx], -1, (0, 0, 255), 8)
-            middle = np.sum(corners, axis=0) / 4
+            middle = np.sum(corners, axis=0) / 4  # store the center of the potential facelet
             cent.append(np.asarray(middle))
 
 
@@ -302,16 +300,23 @@ def grab_colors():
         h = cv2.bitwise_and(h, h, mask=h_mask)
         hsv = cv2.merge((h, s, v)).astype(float)
 
+        # define two empty masks for the white-filter and the color-filter
         color_mask = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # mask for colors
         white_mask = cv2.inRange(bgrcap, np.array([1, 1, 1]), np.array([0, 0, 0]))  # special mask for white
 
-        cent = []
-        find_squares(bgrcap, grid_N)
-        del_duplicates(cent)
+        cent = []  # the centers of the facelet-square candidates are stored in this global variable
+        find_squares(bgrcap, grid_N)  # find the candidates
+        del_duplicates(cent)  # delete candidates which are too close together
 
+        # the medoid is the center which has the closest summed distances to the other centers
+        # It should be the center facelet of the cube
         m = medoid(cent)
 
-        cf, ef = facelets(cent, m)
+        cf, ef = facelets(cent, m)  # identify the centers of the corner and edge facelets
+
+        # compute the alternate corner and edges facelet centers. These are the point reflections of an already
+        # known facelet center at the medoid center. Should some facelet center not be detected by itself it usually
+        # still is detected in this way.
         acf, aef = mirr_facelet(cf, ef, m)
 
         display_colorname(bgrcap, m)
@@ -333,7 +338,7 @@ def grab_colors():
         cv2.imshow('Webcam - type "x" to quit.', bgrcap)
 
         k = cv2.waitKey(5) & 0xFF
-        if k == 120:  # x
+        if k == 120:  # type x to exit
             break
 
 

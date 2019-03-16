@@ -14,5 +14,3 @@ thr.start()
 import client_gui2
 # Start the GUI with several sliders to configure some opencv parameters
 
-
-# TODO: Explain how to use the GUI interface
