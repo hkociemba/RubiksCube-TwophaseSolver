@@ -15,4 +15,5 @@ Make sure that you use Python 3.4 or higher and you have the numpy package insta
 
 If you run the script "computer_vision.py" you have the possibility to enter the facelet colors with a webcam. There are several parameters which have an influence on the facelet detection quality.  If you use a Raspberry Pi with the Raspberry Pi Camera Module  and not an USB-webcam make sure you do "sudo modprobe bcm2835-v4l2" first. 
 
+You can find some more information how to set the parameters here:
 [Computer vision and Rubik's cube](http://kociemba.org/computervision.html)
