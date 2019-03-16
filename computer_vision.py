@@ -16,4 +16,3 @@ import client_gui2
 
 
 # TODO: Explain how to use the GUI interface
-# TODO: Adapt opencv code to work with Raspberry Pi
