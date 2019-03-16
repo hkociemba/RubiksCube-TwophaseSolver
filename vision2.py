@@ -223,7 +223,7 @@ def find_squares(bgrcap, n):
             white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
                 cv2.bitwise_or(mask, white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
 
-            # similar procedure for the color mask. Some issues because hues are computet modulo 180
+            # similar procedure for the color mask. Some issues because hues are computed modulo 180
             if sigma < vision_params.sigma_C:
                 rect3x3 = h[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz]
                 if median_h + delta >= 180:
@@ -257,7 +257,7 @@ def find_squares(bgrcap, n):
         for n in range(len(contours)):
             approx = cv2.approxPolyDP(contours[n], sz // 2, True)
             # if the contour cannot be approximated by a quadrangle it is not a facelet square
-            if approx.shape[0] < 4 or approx.shape[0] > 4:
+            if approx.shape[0] != 4:
                 continue
             corners = approx[:, 0]  # get the corners of the potential facelet square
 
@@ -330,8 +330,9 @@ def grab_colors():
             display_colorname(bgrcap, i)
 
         vision_params.face_hsv, vision_params.face_col = getcolors(cf, ef, acf, aef, m)
-
         # drawgrid(bgrcap, grid_N)
+
+        # show the windows
         cv2.imshow('color_filter', cv2.resize(color_mask, (width // 2, height // 2)))
         cv2.imshow('white_filter', cv2.resize(white_mask, (width // 2, height // 2)))
         cv2.imshow('black_filter', cv2.resize(black_mask, (width // 2, height // 2)))
