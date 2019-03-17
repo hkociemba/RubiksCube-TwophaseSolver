@@ -333,9 +333,9 @@ def grab_colors():
         # drawgrid(bgrcap, grid_N)
 
         # show the windows
-        cv2.imshow('color_filter', cv2.resize(color_mask, (width // 2, height // 2)))
-        cv2.imshow('white_filter', cv2.resize(white_mask, (width // 2, height // 2)))
-        cv2.imshow('black_filter', cv2.resize(black_mask, (width // 2, height // 2)))
+        cv2.imshow('color_filter mask', cv2.resize(color_mask, (width // 2, height // 2)))
+        cv2.imshow('white_filter mask', cv2.resize(white_mask, (width // 2, height // 2)))
+        cv2.imshow('black_filter mask', cv2.resize(black_mask, (width // 2, height // 2)))
         cv2.imshow('Webcam - type "x" to quit.', bgrcap)
 
         k = cv2.waitKey(5) & 0xFF
