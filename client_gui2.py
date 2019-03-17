@@ -288,7 +288,7 @@ s_blue_H = Scale(root, from_=120, to=180, length=width * 1.4, showvalue=0, label
 canvas.create_window(10, 12 + 8.4 * width, anchor=NW, window=s_blue_H)
 s_blue_H.set(vision_params.blue_H)
 
-s_rgb_L = Scale(root, from_=10, to=140, length=width * 1.4, showvalue=0, label='black-filter', orient=HORIZONTAL,
+s_rgb_L = Scale(root, from_=0, to=140, length=width * 1.4, showvalue=0, label='black-filter', orient=HORIZONTAL,
                 command=set_rgb_L)
 canvas.create_window(10 + width * 1.5, 12 + 6 * width, anchor=NW, window=s_rgb_L)
 s_rgb_L.set(vision_params.rgb_L)
