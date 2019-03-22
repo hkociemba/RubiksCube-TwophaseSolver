@@ -137,9 +137,15 @@ def getcolor(p):
     elif vision_params.orange_H <= mh < vision_params.yellow_H:
         return median, 'yellow'
     elif vision_params.yellow_H <= mh < vision_params.green_H:
-        return median, 'green'
+        if ms < 150:
+            return median, 'white'  # green saturation is always higher
+        else:
+            return median, 'green'
     elif vision_params.green_H <= mh < vision_params.blue_H:
-        return median, 'blue'
+        if ms < 150:
+            return median, 'white'  # blue saturation is always higher
+        else:
+            return median, 'blue'
     else:
         return median, 'red'
 
@@ -329,7 +335,9 @@ def grab_colors():
         for i in acf:
             display_colorname(bgrcap, i)
 
+        # the results supplied by getcolors are used in client_gui2.py for the "Webcam import"
         vision_params.face_hsv, vision_params.face_col = getcolors(cf, ef, acf, aef, m)
+
         # drawgrid(bgrcap, grid_N)
 
         # show the windows
