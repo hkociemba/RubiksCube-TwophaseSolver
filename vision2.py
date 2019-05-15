@@ -259,6 +259,7 @@ def find_squares(bgrcap, n):
     # search for squares in the white_mask and in the color_mask
     for j in itr:
         # find contours
+        # works for OpenCV 3.2 or higher. For versions < 3.2 omit im2 in the line below.
         im2, contours, hierarchy = cv2.findContours(j, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for n in range(len(contours)):
             approx = cv2.approxPolyDP(contours[n], sz // 2, True)
