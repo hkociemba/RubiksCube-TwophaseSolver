@@ -273,7 +273,7 @@ class CubieCube:
 
     def get_slice_sorted(self):
         """Permutation and location of the UD-slice edges FR,FL,BL and BR.
-           slice_sorted  < 11880 in phase 1, slice_sorted  < 24 in phase 2, slice_sorted = 0 for solved cube."""
+           0 <= slice_sorted < 11880 in phase 1, 0 <= slice_sorted < 24 in phase 2, slice_sorted = 0 for solved cube."""
         a = x = 0
         edge4 = [0]*4
         # First compute the index a < (12 choose 4) and the permutation array perm.
@@ -324,7 +324,7 @@ class CubieCube:
 
     def get_u_edges(self):
         """Permutation and location of edges UR, UF, UL and UB.
-           u_edges  < 11880 in phase 1, u_edges  < 1656 + 24 in phase 2, u_edges = 1656 for solved cube."""
+           0 <= u_edges < 11880 in phase 1, 0 <= u_edges < 1680 in phase 2, u_edges = 1656 for solved cube."""
         a = x = 0
         edge4 = [0]*4
         ep_mod = self.ep[:]
@@ -380,7 +380,7 @@ class CubieCube:
 
     def get_d_edges(self):
         """permutation and location of the edges DR, DF, DL and DB.
-           d_edges  < 11880 in phase 1, d_edges  < 1680 in phase 2, d_edges = 0 for solved cube."""
+           0 <= d_edges < 11880 in phase 1, 0 <= d_edges  < 1680 in phase 2, d_edges = 0 for solved cube."""
         a = x = 0
         edge4 = [0] * 4
         ep_mod = self.ep[:]
@@ -435,7 +435,8 @@ class CubieCube:
             rotate_left(self.ep, 0, 11)
 
     def get_corners(self):
-        """The permutation of the 8 corners. 0 <= corners < 40320."""
+        """The permutation of the 8 corners.
+            0 <= corners < 40320 defined but unused in phase 1, 0 <= corners < 40320 in phase 2, corners = 0 for solved cube"""
         perm = list(self.cp)  # duplicate cp
         b = 0
         for j in range(Co.DRB, Co.URF, -1):
@@ -456,8 +457,8 @@ class CubieCube:
                 k -= 1
 
     def get_ud_edges(self):
-        """The permutation of the 8 U and D edges. 0 <= _ud_edges < 40320.
-        Only valid in phase 2 of the two-phase algorithm."""
+        """The permutation of the 8 U and D edges.
+            ud_edges undefined in phase 1, 0 <= ud_edges  < 40320 in phase 2, ud_edges = 0 for solved cube."""
         perm = self.ep[0:8]  # duplicate first 8 elements of ep
         b = 0
         for j in range(Ed.DB, Ed.UR, -1):
