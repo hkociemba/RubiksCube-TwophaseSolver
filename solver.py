@@ -53,7 +53,7 @@ class SolverThread(thr.Thread):
         if self.terminated.is_set():
             return
         ################################################################################################################
-        if togo_phase2 == 0:
+        if togo_phase2 == 0 and slice_sorted == 0:
             self.lock.acquire()  # phase 2 solved, store solution
             man = self.sofar_phase1 + self.sofar_phase2
             if len(self.solutions) == 0 or (len(self.solutions[-1]) > len(man)):
