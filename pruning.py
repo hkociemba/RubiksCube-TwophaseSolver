@@ -49,7 +49,7 @@ def set_corners_ud_edges_depth3(ix, value):
 
 
 def create_phase1_prun_table():
-    """Creates/loads the flipslice_twist_depth3 pruning table for phase 1."""
+    """Create/load the flipslice_twist_depth3 pruning table for phase 1."""
     global flipslice_twist_depth3
     total = defs.N_FLIPSLICE_CLASS * defs.N_TWIST
     fname = "phase1_prun"
@@ -172,7 +172,7 @@ def create_phase1_prun_table():
 
 
 def create_phase2_prun_table():
-    """Creates/loads the corners_ud_edges_depth3 pruning table for phase 2."""
+    """Create/load the corners_ud_edges_depth3 pruning table for phase 2."""
     total = defs.N_CORNERS_CLASS * defs.N_UD_EDGES
     fname = "phase2_prun"
     global corners_ud_edges_depth3
@@ -275,7 +275,7 @@ def create_phase2_prun_table():
 
 
 def create_phase2_cornsliceprun_table():
-    """Creates/loads the cornslice_depth pruning table for phase 2. With this table we do a fast precheck
+    """Create/load the cornslice_depth pruning table for phase 2. With this table we do a fast precheck
     at the beginning of phase 2."""
     fname = "phase2_cornsliceprun"
     global cornslice_depth

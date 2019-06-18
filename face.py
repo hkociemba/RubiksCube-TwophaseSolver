@@ -6,7 +6,7 @@ from cubie import CubieCube
 
 
 class FaceCube:
-    """Represents a cube on the facelet level with 54 colored facelets."""
+    """Represent a cube on the facelet level with 54 colored facelets."""
     def __init__(self):
         self.f = []
         for i in range(9):
@@ -26,7 +26,7 @@ class FaceCube:
         return self.to_string()
 
     def from_string(self, s):
-        """Constructs a facelet cube from a string. See class Facelet(IntEnum) in enums.py for string format."""
+        """Construct a facelet cube from a string. See class Facelet(IntEnum) in enums.py for string format."""
         if len(s) < 54:
             return 'Error: Cube definition string ' + s + ' contains less than 54 facelets.'
         elif len(s) > 54:
@@ -58,7 +58,7 @@ class FaceCube:
 
 
     def to_string(self):
-        """Gives string representation of the facelet cube."""
+        """Give a string representation of the facelet cube."""
         s = ''
         for i in range(54):
             if self.f[i] == Color.U:
@@ -76,7 +76,7 @@ class FaceCube:
         return s
 
     def to_2dstring(self):
-        """Gives 2dstring representation of a facelet cube."""
+        """Give a 2dstring representation of a facelet cube."""
         s = self.to_string()
         r = '   ' + s[0:3] + '\n   ' + s[3:6] + '\n   ' + s[6:9] + '\n'
         r += s[36:39] + s[18:21] + s[9:12] + s[45:48] + '\n' + s[39:42] + s[21:24] + s[12:15] + s[48:51] \
@@ -85,7 +85,7 @@ class FaceCube:
         return r
 
     def to_cubie_cube(self):
-        """Returns a cubie representation of the facelet cube."""
+        """Return a cubie representation of the facelet cube."""
         cc = CubieCube()
         cc.cp = [-1] * 8  # invalidate corner and edge permutation
         cc.ep = [-1] * 12

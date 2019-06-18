@@ -6,7 +6,7 @@ import face
 import cubie
 
 
-# ################################## some global variables and constants ###############################################
+# ################################## Some global variables and constants ###############################################
 DEFAULT_HOST = 'localhost'
 DEFAULT_PORT = '8080'
 width = 60  # width of a facelet in pixels
@@ -21,14 +21,14 @@ cols = ("yellow", "green", "red", "white", "blue", "orange")
 
 
 def show_text(txt):
-    """Displays messages."""
+    """Display messages."""
     print(txt)
     display.insert(INSERT, txt)
     root.update_idletasks()
 
 
 def create_facelet_rects(a):
-    """Initializes the facelet grid on the canvas."""
+    """Initialize the facelet grid on the canvas."""
     offset = ((1, 0), (2, 1), (1, 1), (1, 2), (0, 1), (3, 1))
     for f in range(6):
         for row in range(3):
@@ -43,7 +43,7 @@ def create_facelet_rects(a):
 
 
 def create_colorpick_rects(a):
-    """Initializes the "paintbox" on the canvas"""
+    """Initialize the "paintbox" on the canvas."""
     global curcol
     global cols
     for i in range(6):
@@ -55,7 +55,7 @@ def create_colorpick_rects(a):
 
 
 def get_definition_string():
-    """Generates the cube definition string from the facelet colors."""
+    """Generate the cube definition string from the facelet colors."""
     color_to_facelet = {}
     for i in range(6):
         color_to_facelet.update({canvas.itemcget(facelet_id[i][1][1], "fill"): t[i]})
@@ -71,7 +71,7 @@ def get_definition_string():
 
 
 def solve():
-    """Connects to the server and returns the solving maneuver."""
+    """Connect to the server and return the solving maneuver."""
     display.delete(1.0, END)  # clear output window
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -111,7 +111,7 @@ def solve():
 
 
 def clean():
-    """Restores the cube to a clean cube."""
+    """Restore the cube to a clean cube."""
     for f in range(6):
         for row in range(3):
             for col in range(3):
@@ -119,7 +119,7 @@ def clean():
 
 
 def empty():
-    """Removes the facelet colors except the center facelets colors."""
+    """Remove the facelet colors except the center facelets colors."""
     for f in range(6):
         for row in range(3):
             for col in range(3):
@@ -128,7 +128,7 @@ def empty():
 
 
 def random():
-    """Generates a random cube and sets the corresponding facelet colors."""
+    """Generate a random cube and set the corresponding facelet colors."""
     cc = cubie.CubieCube()
     cc.randomize()
     fc = cc.to_facelet_cube()
@@ -144,7 +144,7 @@ def random():
 
 
 def click(event):
-    """Defines how to react on left mouse clicks"""
+    """Define how to react on left mouse clicks."""
     global curcol
     idlist = canvas.find_withtag("current")
     if len(idlist) > 0:

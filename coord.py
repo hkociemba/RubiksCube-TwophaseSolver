@@ -1,4 +1,4 @@
-# ####### The cube on the coordinate level is described by a 3-tuple of natural numbers in phase 1 and phase 2. ########
+# ##### The cube on the coordinate level. It is described by a 3-tuple of natural numbers in phase 1 and phase 2. ######
 
 from os import path
 import array as ar
@@ -16,7 +16,7 @@ u_edges_plus_d_edges_to_ud_edges = None  # global variable
 
 
 class CoordCube:
-    """Represents a cube on the coordinate level.
+    """Represent a cube on the coordinate level.
     
     In phase 1 a state is uniquely determined by the three coordinates flip, twist and slice.
     In phase 2 a state is uniquely determined by the three coordinates corners, ud_edges and slice_sorted.
@@ -69,7 +69,7 @@ class CoordCube:
         # optional:
         self.u_edges = mv.u_edges_move[N_MOVE * self.u_edges + m]  # u_edges and d_edges retrieve ud_edges easily
         self.d_edges = mv.d_edges_move[N_MOVE * self.d_edges + m]  # if phase 1 is finished and phase 2 starts
-        self.corners = mv.corners_move[N_MOVE * self.corners + m]  # needed only in phase 2
+        self.corners = mv.corners_move[N_MOVE * self.corners + m]  # Is needed only in phase 2
 
         self.flipslice_classidx = sy.flipslice_classidx[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
         self.flipslice_sym = sy.flipslice_sym[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]

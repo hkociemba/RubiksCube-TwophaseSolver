@@ -10,7 +10,7 @@ from enums import Corner as Co, Edge as Ed, Move as Mv, BS
 
 INVALID = 65535
 
-#  #################### permutations and orientation changes of the basic symmetries ###################################
+#  #################### Permutations and orientation changes of the basic symmetries ###################################
 
 # 120° clockwise rotation around the long diagonal URF-DBL
 cpROT_URF3 = [Co.URF, Co.DFR, Co.DLF, Co.UFL, Co.UBR, Co.DRB, Co.DBL, Co.ULB]
@@ -43,7 +43,7 @@ basicSymCube[BS.ROT_U4] = cb.CubieCube(cpROT_U4, coROT_U4, epROT_U4, eoROT_U4)
 basicSymCube[BS.MIRR_LR2] = cb.CubieCube(cpMIRR_LR2, coMIRR_LR2, epMIRR_LR2, eoMIRR_LR2)
 # ######################################################################################################################
 
-# ######################################## fill SymCube list ###########################################################
+# ######################################## Fill SymCube list ###########################################################
 
 # 48 CubieCubes will represent the 48 cube symmetries
 symCube = []
@@ -61,7 +61,7 @@ for urf3 in range(3):
     cc.multiply(basicSymCube[BS.ROT_URF3])
 ########################################################################################################################
 
-# ########################################## fill the inv_idx array ####################################################
+# ########################################## Fill the inv_idx array ####################################################
 
 # Indices for the inverse symmetries: SymCube[inv_idx[idx]] == SymCube[idx]^(-1)
 inv_idx = [0] * N_SYM
@@ -74,7 +74,7 @@ for j in range(N_SYM):
             break
 ########################################################################################################################
 
-# ################################# generate the group table for the 48 cube symmetries ################################
+# ################################# Generate the group table for the 48 cube symmetries ################################
 mult_sym = np.empty([N_SYM, N_SYM], dtype=np.uint8)
 for i in range(N_SYM):
     for j in range(N_SYM):
@@ -86,7 +86,7 @@ for i in range(N_SYM):
                 break
 ########################################################################################################################
 
-# #### generate the table for the conjugation of a move m by a symmetry s. conj_move[m, s] = s*m*s^-1###################
+# #### Generate the table for the conjugation of a move m by a symmetry s. conj_move[m, s] = s*m*s^-1 ##################
 conj_move = np.empty([N_MOVE, N_SYM], dtype=np.uint8)
 for s in range(N_SYM):
     for m in Mv:
@@ -98,7 +98,7 @@ for s in range(N_SYM):
                 conj_move[m][s] = m2
 ########################################################################################################################
 
-# ####### generate the phase 1 table for the conjugation of the twist t by a symmetry s. twist_conj[t, s] = s*t*s^-1####
+# ###### Generate the phase 1 table for the conjugation of the twist t by a symmetry s. twist_conj[t, s] = s*t*s^-1 ####
 fname = "conj_twist"
 if not path.isfile(fname):
     print('On the first run, several tables will be created. This takes from 1/2 hour (e.g. PC) to 6 hours '
@@ -124,7 +124,7 @@ else:
 fh.close()
 # ######################################################################################################################
 
-# #################### generate the phase 2 table for the conjugation of the URtoDB coordinate by a symmetrie###########
+# #################### Generate the phase 2 table for the conjugation of the URtoDB coordinate by a symmetrie ##########
 fname = "conj_ud_edges"
 if not path.isfile(fname):
     print("creating " + fname + " table...")
@@ -152,7 +152,7 @@ else:
 fh.close()
 # ######################################################################################################################
 
-# ############## generate the tables to handle the symmetry reduced flip-slice coordinate in  phase 1 ##################
+# ############## Generate the tables to handle the symmetry reduced flip-slice coordinate in  phase 1 ##################
 fname1 = "fs_classidx"
 fname2 = "fs_sym"
 fname3 = "fs_rep"
@@ -218,7 +218,7 @@ else:
     fh.close()
 ########################################################################################################################
 
-# ############ generate the tables to handle the symmetry reduced corner permutation coordinate in phase 2##############
+# ############ Generate the tables to handle the symmetry reduced corner permutation coordinate in phase 2 #############
 fname1 = "co_classidx"
 fname2 = "co_sym"
 fname3 = "co_rep"

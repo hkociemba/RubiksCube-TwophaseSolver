@@ -9,7 +9,7 @@ background_thread.start()
 
 thr = Thread(target=grab_colors, args=())
 thr.start()
-# run the opencv code and detect facelet colors
+# Run the opencv code and detect facelet colors
 
 import client_gui2
 # Start the GUI with several sliders to configure some opencv parameters

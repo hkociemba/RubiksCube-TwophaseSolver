@@ -7,7 +7,7 @@ from misc import c_nk, rotate_left, rotate_right
 from random import randrange
 
 
-# ################## the basic six cube moves described by permutations and changes in orientation #####################
+# ################## The basic six cube moves described by permutations and changes in orientation #####################
 
 # Up-move
 cpU = [Co.UBR, Co.URF, Co.UFL, Co.ULB, Co.DFR, Co.DLF, Co.DBL, Co.DRB]
@@ -50,7 +50,7 @@ CUBE_OK = True
 
 
 class CubieCube:
-    """Represents a cube on the cubie level with 8 corner cubies, 12 edge cubies and the cubie orientations.
+    """Represent a cube on the cubie level with 8 corner cubies, 12 edge cubies and the cubie orientations.
     
     Is also used to represent:
     1. the 18 cube moves
@@ -82,7 +82,7 @@ class CubieCube:
             self.eo = eo[:]
 
     def __str__(self):
-        """Prints string for a cubie cube."""
+        """Print string for a cubie cube."""
         s = ''
         for i in Co:
             s = s + '(' + str(self.cp[i]) + ',' + str(self.co[i]) + ')'
@@ -92,14 +92,14 @@ class CubieCube:
         return s
 
     def __eq__(self, other):
-        """Defines equality of two cubie cubes."""
+        """Define equality of two cubie cubes."""
         if self.cp == other.cp and self.co == other.co and self.ep == other.ep and self.eo == other.eo:
             return True
         else:
             return False
 
     def to_facelet_cube(self):
-        """Returns a facelet representation of the cube."""
+        """Return a facelet representation of the cube."""
         fc = face.FaceCube()
         for i in Co:
             j = self.cp[i]  # corner j is at corner position i
@@ -114,7 +114,7 @@ class CubieCube:
         return fc
 
     def corner_multiply(self, b):
-        """Multiplies this cubie cube with another cubie cube b, restricted to the corners. Does not change b."""
+        """Multiply this cubie cube with another cubie cube b, restricted to the corners. Does not change b."""
         c_perm = [0]*8
         c_ori = [0]*8
         ori = 0
@@ -144,7 +144,7 @@ class CubieCube:
             self.co[c] = c_ori[c]
 
     def edge_multiply(self, b):
-        """ Multiplies this cubie cube with another cubiecube b, restricted to the edges. Does not change b."""
+        """ Multiply this cubie cube with another cubiecube b, restricted to the edges. Does not change b."""
         e_perm = [0]*12
         e_ori = [0]*12
         for e in Ed:
@@ -159,7 +159,7 @@ class CubieCube:
         self.edge_multiply(b)
 
     def inv_cubie_cube(self, d):
-        """Stores the inverse of this cubie cube in d."""
+        """Store the inverse of this cubie cube in d."""
         for e in Ed:
             d.ep[self.ep[e]] = e
         for e in Ed:
@@ -177,7 +177,7 @@ class CubieCube:
                     d.co[c] += 3
 
     def corner_parity(self):
-        """Gives the parity of the corner permutation."""
+        """Give the parity of the corner permutation."""
         s = 0
         for i in range(Co.DRB, Co.URF, -1):
             for j in range(i - 1, Co.URF - 1, -1):
@@ -186,7 +186,7 @@ class CubieCube:
         return s % 2
 
     def edge_parity(self):
-        """Gives the parity of the edge permutation. A solvable cube has the same corner and edge parity."""
+        """Give the parity of the edge permutation. A solvable cube has the same corner and edge parity."""
         s = 0
         for i in range(Ed.BR, Ed.UR, -1):
             for j in range(i - 1, Ed.UR - 1, -1):
@@ -195,7 +195,7 @@ class CubieCube:
         return s % 2
 
     def symmetries(self):
-        """Generates a list of the symmetries and antisymmetries of the cubie cube"""
+        """Generate a list of the symmetries and antisymmetries of the cubie cube."""
         from symmetries import symCube, inv_idx  # not nice here but else we have circular imports
         s = []
         d = CubieCube()
@@ -212,7 +212,7 @@ class CubieCube:
 
 # ###################################### coordinates for phase 1 and 2 #################################################
     def get_twist(self):
-        """The twist of the 8 corners. 0 <= twist < 2187 in phase 1, twist = 0 in phase 2."""
+        """Get the twist of the 8 corners. 0 <= twist < 2187 in phase 1, twist = 0 in phase 2."""
         ret = 0
         for i in range(Co.URF, Co.DRB):
             ret = 3 * ret + self.co[i]
@@ -227,7 +227,7 @@ class CubieCube:
         self.co[Co.DRB] = ((3 - twistparity % 3) % 3)
 
     def get_flip(self):
-        """The flip of the 12 edges. 0 <= flip < 2048 in phase 1, flip = 0 in phase 2."""
+        """Get the flip of the 12 edges. 0 <= flip < 2048 in phase 1, flip = 0 in phase 2."""
         ret = 0
         for i in range(Ed.UR, Ed.BR):
             ret = 2 * ret + self.eo[i]
@@ -242,7 +242,8 @@ class CubieCube:
         self.eo[Ed.BR] = ((2 - flipparity % 2) % 2)
 
     def get_slice(self):
-        """Location of the UD-slice edges FR,FL,BL and BR ignoring their permutation."""
+        """Get the location of the UD-slice edges FR,FL,BL and BR ignoring their permutation.
+            0<= slice < 495 in phase 1, slice = 0 in phase 2."""
         a = x = 0
         # Compute the index a < (12 choose 4)
         for j in range(Ed.BR, Ed.UR - 1, -1):
@@ -272,8 +273,8 @@ class CubieCube:
                 x += 1
 
     def get_slice_sorted(self):
-        """Permutation and location of the UD-slice edges FR,FL,BL and BR.
-           0 <= slice_sorted < 11880 in phase 1, 0 <= slice_sorted < 24 in phase 2, slice_sorted = 0 for solved cube."""
+        """Get the permutation and location of the UD-slice edges FR,FL,BL and BR.
+            0 <= slice_sorted < 11880 in phase 1, 0 <= slice_sorted < 24 in phase 2, slice_sorted = 0 for solved cube."""
         a = x = 0
         edge4 = [0]*4
         # First compute the index a < (12 choose 4) and the permutation array perm.
@@ -323,8 +324,8 @@ class CubieCube:
                 x += 1
 
     def get_u_edges(self):
-        """Permutation and location of edges UR, UF, UL and UB.
-           0 <= u_edges < 11880 in phase 1, 0 <= u_edges < 1680 in phase 2, u_edges = 1656 for solved cube."""
+        """Get the permutation and location of edges UR, UF, UL and UB.
+            0 <= u_edges < 11880 in phase 1, 0 <= u_edges < 1680 in phase 2, u_edges = 1656 for solved cube."""
         a = x = 0
         edge4 = [0]*4
         ep_mod = self.ep[:]
@@ -379,8 +380,8 @@ class CubieCube:
             rotate_left(self.ep, 0, 11)
 
     def get_d_edges(self):
-        """permutation and location of the edges DR, DF, DL and DB.
-           0 <= d_edges < 11880 in phase 1, 0 <= d_edges  < 1680 in phase 2, d_edges = 0 for solved cube."""
+        """Get the permutation and location of the edges DR, DF, DL and DB.
+            0 <= d_edges < 11880 in phase 1, 0 <= d_edges < 1680 in phase 2, d_edges = 0 for solved cube."""
         a = x = 0
         edge4 = [0] * 4
         ep_mod = self.ep[:]
@@ -435,8 +436,9 @@ class CubieCube:
             rotate_left(self.ep, 0, 11)
 
     def get_corners(self):
-        """The permutation of the 8 corners.
-            0 <= corners < 40320 defined but unused in phase 1, 0 <= corners < 40320 in phase 2, corners = 0 for solved cube"""
+        """Get the permutation of the 8 corners.
+            0 <= corners < 40320 defined but unused in phase 1, 0 <= corners < 40320 in phase 2,
+            corners = 0 for solved cube"""
         perm = list(self.cp)  # duplicate cp
         b = 0
         for j in range(Co.DRB, Co.URF, -1):
@@ -457,8 +459,8 @@ class CubieCube:
                 k -= 1
 
     def get_ud_edges(self):
-        """The permutation of the 8 U and D edges.
-            ud_edges undefined in phase 1, 0 <= ud_edges  < 40320 in phase 2, ud_edges = 0 for solved cube."""
+        """Get the permutation of the 8 U and D edges.
+            ud_edges undefined in phase 1, 0 <= ud_edges < 40320 in phase 2, ud_edges = 0 for solved cube."""
         perm = self.ep[0:8]  # duplicate first 8 elements of ep
         b = 0
         for j in range(Ed.DB, Ed.UR, -1):
@@ -483,7 +485,7 @@ class CubieCube:
 
 # ############################################ other usefull functions #################################################
     def randomize(self):
-        """Generates a random cube. The probability is the same for all possible states."""
+        """Generate a random cube. The probability is the same for all possible states."""
         def set_edges(idx):
             """The permutation of the 12 edges. 0 <= idx < 12!."""
             self.ep = [i for i in Ed]
@@ -503,7 +505,7 @@ class CubieCube:
         self.set_twist(randrange(2187))  # 3^7
 
     def verify(self):
-        """Checks if cubiecube is valid"""
+        """Check if cubiecube is valid."""
         edge_count = [0]*12
         for i in Ed:
             edge_count[self.ep[i]] += 1

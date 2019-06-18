@@ -11,7 +11,7 @@ grid_N = 25  # number of grid-squares in vertical direction
 
 
 def drawgrid(img, n):
-    """draw grid onto the webcam output. Only used for debugging purposes."""
+    """Draw grid onto the webcam output. Only used for debugging purposes."""
     h, w = img.shape[:2]
     sz = h // n
     border = 1 * sz
@@ -22,7 +22,7 @@ def drawgrid(img, n):
 
 
 def del_duplicates(pts):
-    """if two potential facelet centers stored in pts are too close together, one of them is deleted"""
+    """Delete one of two potential facelet centers stored in pts if they are too close to each other."""
     delta = width / 12  # width is defined global in grabcolors()
     dele = True
     while dele:
@@ -40,7 +40,7 @@ def del_duplicates(pts):
 
 
 def medoid(pts):
-    """ The mediod is the point with the smallest summed distance from the other points.
+    """The mediod is the point with the smallest summed distance from the other points.
     This is a candidate for the center facelet."""
     res = np.array([0.0, 0.0])
     smin = 100000
@@ -110,7 +110,7 @@ def mirr_facelet(co, ed, med):
 
 
 def display_colorname(bgrcap, p):
-    """ Display the colornames on the webcam picture"""
+    """Display the colornames on the webcam picture."""
     p = p.astype(np.uint16)
     _, col = getcolor(p)
     if col in ('blue', 'green', 'red'):
@@ -124,7 +124,7 @@ def display_colorname(bgrcap, p):
 
 
 def getcolor(p):
-    """ Decide the color of a facelet by its h value (non white) or by s and v (white)"""
+    """Decide the color of a facelet by its h value (non white) or by s and v (white)."""
     sz = 10
     p = p.astype(np.uint16)
     rect = hsv[p[1] - sz:p[1] + sz, p[0] - sz:p[0] + sz]
@@ -151,7 +151,7 @@ def getcolor(p):
 
 
 def getcolors(co, ed, aco, aed, m):
-    """Find the colors of the 9 facelets and decide their position on the cube face"""
+    """Find the colors of the 9 facelets and decide their position on the cube face."""
     centers = [[m for x in range(3)] for x in range(3)]
     colors = [['' for x in range(3)] for x in range(3)]
     s = np.array([0., 0., 0.])
@@ -194,7 +194,7 @@ def getcolors(co, ed, aco, aed, m):
 
 
 def find_squares(bgrcap, n):
-    """ Find the positions of squares in the webcam picture"""
+    """ Find the positions of squares in the webcam picture."""
     global mask, color_mask, white_mask, black_mask
 
     h, s, v = cv2.split(hsv)
@@ -284,7 +284,7 @@ def find_squares(bgrcap, n):
 
 
 def grab_colors():
-    """Find the cube in the webcam picture and grab the colors of the facelets"""
+    """Find the cube in the webcam picture and grab the colors of the facelets."""
     global cent, width, height, hsv, color_mask, white_mask
     cap = cv2.VideoCapture(0)
     _, bgrcap = cap.read()
