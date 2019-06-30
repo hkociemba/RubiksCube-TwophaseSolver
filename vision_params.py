@@ -30,6 +30,6 @@ blue_H = 160  # highest allowed hue for color blue
 face_col = []  # the colors (as text) of a cube face
 face_hsv = []  # the colors (as hsv-values) of a cube face
 
-# These dictionaries define the colors of all 6 facelets and are filled by the client_gui2.transfer routine
+# These dictionaries define the colors of all 6 faces and are filled by the client_gui2.transfer routine
 cube_col = {}  # the colors (as text) of the 6 faces
 cube_hsv = {}  # the colors (as hsv-values) of the 6 faces
