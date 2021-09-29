@@ -20,7 +20,7 @@ class SolverThread(thr.Thread):
         :param ret_length: If a solution with length <= ret_length is found the search stops.
          The most efficient way to solve a cube is to start six threads in parallel with rot = 0, 1 and 2 and 
          inv = 0, 1. The first thread which finds a solutions sets the terminated flag which signals all other threads
-         to teminate. On average this solves a cube about 12 times faster than solving one cube with a single thread.
+         to terminate. On average this solves a cube about 12 times faster than solving one cube with a single thread.
          And this despite of Pythons GlobalInterpreterLock GIL.
         :param timeout: Essentially the maximal search time in seconds. Essentially because the search does not return
          before at least one solution has been found.
