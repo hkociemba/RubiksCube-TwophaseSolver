@@ -483,7 +483,7 @@ class CubieCube:
                 k -= 1
 # ###################################### end coordinates for phase 1 and 2 #############################################
 
-# ############################################ other usefull functions #################################################
+# ############################################ other useful functions ##################################################
     def randomize(self):
         """Generate a random cube. The probability is the same for all possible states."""
         def set_edges(idx):
