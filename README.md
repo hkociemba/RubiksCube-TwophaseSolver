@@ -32,14 +32,14 @@ This solves the cube described by the definition string with a desired maximum l
 U, R, F, D, L and B denote the Up, Right, Front, Down, Left and Back face of the cube. 1, 2, and 3 denote a 90°, 180° and 270° clockwise rotation of the corresponding face. 
 
 
-Another possibility is to locally start a server which listens on a port of your choice and which accepts the cube definition string and returns the solution.
+Another possibility is to locally start a server which listens on a port of your choice. It accepts the cube definition string and returns the solution.
 ```python
 >>> import twophase.server as srv
 >>> srv.start(8080,20,2)
 ```
 If you get a  
 ```Server socket created```  
-```Server now listening...```
+```Server now listening...```   
 message everything seems to work fine.
 In this example the server listens on port 8080, the desired maximum length is 20 moves and the timeout is 2 seconds.
 
@@ -56,15 +56,16 @@ with netcat, if the server runs on the same machine on port 8080.
 
 You also can communicate with the server with a little GUI program which allows to enter the cube definition string interactively.
 ```python
-import twophase.client_gui
+>>> import twophase.client_gui
 ```
 
 ![](gui_client.jpg "")
 
 
-The following module is experimental. It uses the OpenCV package which eventually has be installed with ```$ pip install opencv-python```.
+The following module is experimental. It uses the OpenCV package which eventually has to be installed with ```$ pip install opencv-python```.   
+The webserver has to run and a webcam must be connected to the client.
 ```python
-import twophase.computer_vision
+>>> import twophase.computer_vision
 ```
 
 You have the possibility to enter the facelet colors with a webcam. There are several parameters which have an influence on the facelet detection quality.  If you use a Raspberry Pi with the Raspberry Pi Camera Module  and not an USB-webcam make sure you do "sudo modprobe bcm2835-v4l2" first. 
