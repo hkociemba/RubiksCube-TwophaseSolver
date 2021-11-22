@@ -62,7 +62,8 @@ You also can communicate with the server with a little GUI program which allows 
 ![](gui_client.jpg "")
 
 
-The following module is experimental. It uses the OpenCV package which eventually has to be installed with ```$ pip install opencv-python```.   
+The following module is experimental. It uses the OpenCV package which eventually has to be installed with   
+```$ pip install opencv-python```.   
 The webserver has to run and a webcam must be connected to the client.
 ```python
 >>> import twophase.computer_vision
