@@ -7,7 +7,7 @@ If you just want to solve Rubik's cube and play around with its patterns [Cube E
 
 The package is published on PyPI and can be installed with
 
-```$ pip install RubikTwophase``` 
+```$ pip install RubikTwoPhase``` 
 
 ```$ pip install numpy``` is necessary too if the numpy package is not installed in your environment.
 
@@ -15,7 +15,8 @@ Once installed, you can import the module twophase.solver into your code:
 ```python
 >>> import twophase.solver  as sv
 ```
-There are several tables which must be created, but only on the first run. These need about 80 MB disk space and it takes from about 1/2 to 6 hours to create them, depending on the hardware.
+There are several tables which must be created, but only on the first run. These need about 80 MB of disk space and it takes about 1/2 hour or even longer to create them, depending on the hardware.
+But only with these computational relative expensive tables the algorithm works highly effective and usually will find near optimal solutions.
 
 A cube is defined by its cube definition string. A solved cube has the string 'UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB'.   
 ```python
@@ -31,15 +32,21 @@ This solves the cube described by the definition string with a desired maximum l
 ```
 U, R, F, D, L and B denote the Up, Right, Front, Down, Left and Back face of the cube. 1, 2, and 3 denote a 90°, 180° and 270° clockwise rotation of the corresponding face. 
 
+```python
+>>> sv.solveto(cubestring,goalstring,20,0.1)
+```
+likewise will solve the cube defined by cubestring to the position defined by goalstring and will grant 0.1 s to find a solution with <= 20 moves.   
 
-Another possibility is to locally start a server which listens on a port of your choice. It accepts the cube definition string and returns the solution.
+Another feature is to locally start a server which listens on a port of your choice. It accepts the cube definition string and returns the solution.
 ```python
 >>> import twophase.server as srv
 >>> srv.start(8080,20,2)
-```
-If you get a  
+```   
+If you get a   
+
 ```Server socket created```  
 ```Server now listening...```   
+
 message everything seems to work fine.
 In this example the server listens on port 8080, the desired maximum length is 20 moves and the timeout is 2 seconds.
 

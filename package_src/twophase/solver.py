@@ -241,3 +241,61 @@ def solve(cubestring, max_length=20, timeout=3):
             s += m.name + ' '
     return s + '(' + str(len(s)//3) + 'f)'
 ########################################################################################################################
+
+def solveto(cubestring,goalstring, max_length=20, timeout=3):
+    """Solve a cube defined by cubstring to a position defined by goalstring.
+     :param cubestring: The format of the string is given in the Facelet class defined in the file enums.py
+     :param goalstring: The format of the string is given in the Facelet class defined in the file enums.py
+     :param max_length: The function will return if a maneuver of length <= max_length has been found
+     :param timeout: If the function times out, the best solution found so far is returned. If there has not been found
+     any solution yet the computation continues until a first solution appears.
+    """
+    fc0 = face.FaceCube()
+    fcg = face.FaceCube()
+    s = fc0.from_string(cubestring)
+    if s != cubie.CUBE_OK:
+        return 'first cube ' + s  # no valid cubestring, gives invalid facelet cube
+    s = fcg.from_string(goalstring)
+    if s != cubie.CUBE_OK:
+        return 'second cube ' + s  # no valid goalstring, gives invalid facelet cube
+    cc0 = fc0.to_cubie_cube()
+    s = cc0.verify()
+    if s != cubie.CUBE_OK:
+        return 'first cube ' + s  # no valid facelet cube, gives invalid cubie cube
+    ccg = fcg.to_cubie_cube()
+    s = ccg.verify()
+    if s != cubie.CUBE_OK:
+        return 'second cube ' + s  # no valid facelet cube, gives invalid cubie cube
+    # cc0 * S = ccg  <=> (ccg^-1 * cc0) * S = Id
+    cc = cubie.CubieCube()
+    ccg.inv_cubie_cube(cc)
+    cc.multiply(cc0)
+
+
+    my_threads = []
+    s_time = time.monotonic()
+
+    # these mutable variables are modidified by all six threads
+    s_length = [999]
+    solutions = []
+    terminated = thr.Event()
+    terminated.clear()
+    syms = cc.symmetries()
+    if len(list({16, 20, 24, 28} & set(syms))) > 0:  # we have some rotational symmetry along a long diagonal
+        tr = [0, 3]  # so we search only one direction and the inverse
+    else:
+        tr = range(6)  # This means search in 3 directions + inverse cube
+    if len(list(set(range(48, 96)) & set(syms))) > 0:  # we have some antisymmetry so we do not search the inverses
+        tr = list(filter(lambda x: x < 3, tr))
+    for i in tr:
+        th = SolverThread(cc, i % 3, i // 3, max_length, timeout, s_time, solutions, terminated, [999])
+        my_threads.append(th)
+        th.start()
+    for t in my_threads:
+        t.join()  # wait until all threads have finished
+    s = ''
+    if len(solutions) > 0:
+        for m in solutions[-1]:  # the last solution is the shortest
+            s += m.name + ' '
+    return s + '(' + str(len(s)//3) + 'f)'
+########################################################################################################################
