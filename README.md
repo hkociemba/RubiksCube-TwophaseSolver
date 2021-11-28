@@ -32,10 +32,25 @@ This solves the cube described by the definition string with a desired maximum l
 ```
 U, R, F, D, L and B denote the Up, Right, Front, Down, Left and Back face of the cube. 1, 2, and 3 denote a 90°, 180° and 270° clockwise rotation of the corresponding face. 
 
+If you want to spend a constant of time t for each solve and just return the shortest maneuver found in this time t, do
+```python
+>>> sv.solve(cubestring,0,t)
+```
+You can test the performance of the algorithm on your machine with something similar to
+```python
+>>> import twophase.performance as pf
+>>> pf.test(100,0.3)
+```
+This will for example generate 100 random cubes, solves each in 0.3 s and displays a statistics about the solving lengths.   
+
+You also have the possibility to solve a cube not to the solved position but to some favorite pattern represented by goalstring.
+
 ```python
 >>> sv.solveto(cubestring,goalstring,20,0.1)
 ```
-likewise will solve the cube defined by cubestring to the position defined by goalstring and will grant 0.1 s to find a solution with <= 20 moves.   
+will grant for example 0.1 s to find a solution with <= 20 moves.   
+
+***
 
 Another feature is to locally start a server which listens on a port of your choice. It accepts the cube definition string and returns the solution.
 ```python
@@ -68,7 +83,7 @@ You also can communicate with the server with a little GUI program which allows 
 
 ![](gui_client.jpg "")
 
-
+***
 The following module is experimental. It uses the OpenCV package which eventually has to be installed with   
 ```$ pip install opencv-python```.   
 The webserver has to run and a webcam must be connected to the client.

@@ -226,8 +226,8 @@ def find_squares(bgrcap, n):
                 rect3x3 = hsv[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz]
                 mask = cv2.inRange(rect3x3, (0, 0, vision_params.val_W),
                                    (255, vision_params.sat_W, 255))
-            # and OR it to the white_mask
-            white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
+                # and OR it to the white_mask
+                white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
                 cv2.bitwise_or(mask, white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
 
             # similar procedure for the color mask. Some issues because hues are computed modulo 180
@@ -244,7 +244,10 @@ def find_squares(bgrcap, n):
                 color_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
                     cv2.bitwise_or(mask, color_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
 
-    black_mask = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))
+    maxs = 120 # hardcoded max value for "black" saturation
+    black_mask = cv2.inRange(cv2.cvtColor(bgrcap,cv2.COLOR_BGR2HSV), (0, 0, 0), (179, maxs, vision_params.rgb_L))
+    #black_mask = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))
+
     black_mask = cv2.bitwise_not(black_mask)
 
     color_mask = cv2.bitwise_and(color_mask, black_mask)
@@ -260,8 +263,8 @@ def find_squares(bgrcap, n):
     # search for squares in the white_mask and in the color_mask
     for j in itr:
         # find contours
-        # works for OpenCV 3.0 or higher. For versions < 3.2 omit im2 in the line below.
-        if major==3:
+        # different handling in different opencv versions
+        if major == 3:
             im2, contours, hierarchy = cv2.findContours(j, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         else:
             contours, hierarchy = cv2.findContours(j, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -285,8 +288,8 @@ def find_squares(bgrcap, n):
 
             # cv2.drawContours(bgrcap, [approx], -1, (0, 0, 255), 8)
             middle = np.sum(corners, axis=0) / 4  # store the center of the potential facelet
-            cent.append(np.asarray(middle))
-
+            #cent.append(np.asarray(middle))
+            cent.append(middle)
 
 def grab_colors():
     """Find the cube in the webcam picture and grab the colors of the facelets."""
@@ -307,7 +310,7 @@ def grab_colors():
         # now set all hue values >160 to 0. This is important since the color red often contains hue values
         # in this range *and* also hue values >0 and else we get a mess when we compute mean and variance
         hsv = cv2.cvtColor(bgrcap, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(hsv)  #
+        h, s, v = cv2.split(hsv)
         h_mask = cv2.inRange(h, 0, 160)
         h = cv2.bitwise_and(h, h, mask=h_mask)
         hsv = cv2.merge((h, s, v)).astype(float)
@@ -344,7 +347,7 @@ def grab_colors():
         # the results supplied by getcolors are used in client_gui2.py for the "Webcam import"
         vision_params.face_hsv, vision_params.face_col = getcolors(cf, ef, acf, aef, m)
 
-        # drawgrid(bgrcap, grid_N)
+        #drawgrid(bgrcap, grid_N)
 
         # show the windows
         cv2.imshow('color_filter mask', cv2.resize(color_mask, (width // 2, height // 2)))
