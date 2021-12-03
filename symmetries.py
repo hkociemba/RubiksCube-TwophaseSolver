@@ -1,7 +1,6 @@
 # #################### Symmetry related functions. Symmetry considerations increase the performance of the solver.######
 
 from os import path
-import numpy as np
 import array as ar
 import cubie as cb
 from defs import N_TWIST, N_SYM, N_SYM_D4h, N_FLIP, N_SLICE, N_CORNERS, N_UD_EDGES, N_MOVE, N_FLIPSLICE_CLASS, \
@@ -75,19 +74,39 @@ for j in range(N_SYM):
 ########################################################################################################################
 
 # ################################# Generate the group table for the 48 cube symmetries ################################
-mult_sym = np.empty([N_SYM, N_SYM], dtype=np.uint8)
+# mult_sym = np.empty([N_SYM, N_SYM], dtype=np.uint8)
+# for i in range(N_SYM):
+#     for j in range(N_SYM):
+#         cc = cb.CubieCube(symCube[i].cp, symCube[i].co, symCube[i].ep, symCube[i].eo)
+#         cc.multiply(symCube[j])
+#         for k in range(N_SYM):
+#             if cc == symCube[k]:  # SymCube[i]*SymCube[j] == SymCube[k]
+#                 mult_sym[i][j] = k
+#                 break
+mult_sym = ar.array('H', [0] * (N_SYM * N_SYM))
 for i in range(N_SYM):
     for j in range(N_SYM):
         cc = cb.CubieCube(symCube[i].cp, symCube[i].co, symCube[i].ep, symCube[i].eo)
         cc.multiply(symCube[j])
         for k in range(N_SYM):
             if cc == symCube[k]:  # SymCube[i]*SymCube[j] == SymCube[k]
-                mult_sym[i][j] = k
+                mult_sym[N_SYM * i + j] = k
                 break
 ########################################################################################################################
 
 # #### Generate the table for the conjugation of a move m by a symmetry s. conj_move[m, s] = s*m*s^-1 ##################
-conj_move = np.empty([N_MOVE, N_SYM], dtype=np.uint8)
+# conj_move = np.empty([N_MOVE, N_SYM], dtype=np.uint8)
+# for s in range(N_SYM):
+#     for m in Mv:
+#         ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # copy cube
+#         ss.multiply(cb.moveCube[m])  # s*m
+#         ss.multiply(symCube[inv_idx[s]])  # s*m*s^-1
+#         for m2 in Mv:
+#             if ss == cb.moveCube[m2]:
+#                 conj_move[m][s] = m2
+
+# #### Generate the table for the conjugation of a move m by a symmetry s. conj_move[N_MOVE*s + m] = s*m*s^-1 ##########
+conj_move = ar.array('H', [0] * (N_MOVE * N_SYM))
 for s in range(N_SYM):
     for m in Mv:
         ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # copy cube
@@ -95,7 +114,7 @@ for s in range(N_SYM):
         ss.multiply(symCube[inv_idx[s]])  # s*m*s^-1
         for m2 in Mv:
             if ss == cb.moveCube[m2]:
-                conj_move[m][s] = m2
+                conj_move[N_MOVE*s + m] = m2
 ########################################################################################################################
 
 # ###### Generate the phase 1 table for the conjugation of the twist t by a symmetry s. twist_conj[t, s] = s*t*s^-1 ####

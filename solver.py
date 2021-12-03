@@ -4,10 +4,11 @@ import threading as thr
 import cubie
 import symmetries as sy
 import coord
-import enums as en
+from twophase.enums import Move
 import moves as mv
 import pruning as pr
 import time
+from defs import N_MOVE
 
 
 class SolverThread(thr.Thread):
@@ -60,8 +61,8 @@ class SolverThread(thr.Thread):
 
                 if self.inv == 1:  # we solved the inverse cube
                     man = list(reversed(man))
-                    man[:] = [en.Move((m // 3) * 3 + (2 - m % 3)) for m in man]  # R1->R3, R2->R2, R3->R1 etc.
-                man[:] = [en.Move(sy.conj_move[m, 16 * self.rot]) for m in man]
+                    man[:] = [Move((m // 3) * 3 + (2 - m % 3)) for m in man]  # R1->R3, R2->R2, R3->R1 etc.
+                man[:] = [Move(sy.conj_move[N_MOVE * 16 * self.rot + m]) for m in man]
                 self.solutions.append(man)
                 self.shortest_length[0] = len(man)
 
@@ -69,9 +70,9 @@ class SolverThread(thr.Thread):
                 self.terminated.set()
             self.lock.release()
         else:
-            for m in en.Move:
-                if m in [en.Move.R1, en.Move.R3, en.Move.F1, en.Move.F3,
-                         en.Move.L1, en.Move.L3, en.Move.B1, en.Move.B3]:
+            for m in Move:
+                if m in [Move.R1, Move.R3, Move.F1, Move.F3,
+                         Move.L1, Move.L3, Move.B1, Move.B3]:
                     continue
 
                 if len(self.sofar_phase2) > 0:
@@ -114,9 +115,9 @@ class SolverThread(thr.Thread):
             if self.sofar_phase1:  # check if list is not empty
                 m = self.sofar_phase1[-1]
             else:
-                m = en.Move.U1  # value is irrelevant here, no phase 1 moves
+                m = Move.U1  # value is irrelevant here, no phase 1 moves
 
-            if m in [en.Move.R3, en.Move.F3, en.Move.L3, en.Move.B3]:  # phase 1 solution come in pairs
+            if m in [Move.R3, Move.F3, Move.L3, Move.B3]:  # phase 1 solution come in pairs
                 corners = mv.corners_move[18 * self.cornersave + m - 1]  # apply R2, F2, L2 ord B2 on last ph1 solution
             else:
                 corners = self.co_cube.corners
@@ -142,13 +143,13 @@ class SolverThread(thr.Thread):
                 self.search_phase2(corners, ud_edges, slice_sorted, dist2, togo2)
 
         else:
-            for m in en.Move:
+            for m in Move:
                 # dist = 0 means that we are already are in the subgroup H. If there are less than 5 moves left
                 # this forces all remaining moves to be phase 2 moves. So we can forbid these at the end of phase 1
                 # and generate these moves in phase 2.
-                if dist == 0 and togo_phase1 < 5 and m in [en.Move.U1, en.Move.U2, en.Move.U3, en.Move.R2,
-                                                           en.Move.F2, en.Move.D1, en.Move.D2, en.Move.D3,
-                                                           en.Move.L2, en.Move.B2]:
+                if dist == 0 and togo_phase1 < 5 and m in [Move.U1, Move.U2, Move.U3, Move.R2,
+                                                           Move.F2, Move.D1, Move.D2, Move.D3,
+                                                           Move.L2, Move.B2]:
                     continue
 
                 if len(self.sofar_phase1) > 0:
