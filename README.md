@@ -107,7 +107,7 @@ We distinguish between computations with the standard CPython interpreter and co
 includes a Just-in-Time compiler which gives a speedup by a factor of about 10.
 
 test(1000, t) generates 1000 random cubes, the computing time for each cube is t seconds. The distribution of the
-solving lengths also given.
+solving lengths also are given.
 
 #### Standard CPython
 test(1000,30): {14: 0, 15: 2, 16: 12, 17: 74, 18: 279, 19: 534, 20: 99, 21: 0}, average 18.63 moves  
@@ -123,4 +123,5 @@ test(1000,0.01): {16: 0, 17: 1, 18: 25, 19: 95, 20: 349, 21: 461, 22: 69, 23: 0}
 
 
 To achieve an average of less than 19 moves a computing time of 10 s in case of CPython or 1 s in case of PyPy is
-sufficient.
+sufficient. If you are satisfied with an average of 0.5 moves more a computation time of 1 s with CPython and 0.1 s
+with PyPy is sufficient.   
