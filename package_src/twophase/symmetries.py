@@ -63,7 +63,7 @@ for urf3 in range(3):
 # ########################################## Fill the inv_idx array ####################################################
 
 # Indices for the inverse symmetries: SymCube[inv_idx[idx]] == SymCube[idx]^(-1)
-inv_idx = [0] * N_SYM
+inv_idx = ar.array('B', [0] * N_SYM)
 for j in range(N_SYM):
     for i in range(N_SYM):
         cc = cb.CubieCube(symCube[j].cp, symCube[j].co, symCube[j].ep, symCube[j].eo)
@@ -74,16 +74,7 @@ for j in range(N_SYM):
 ########################################################################################################################
 
 # ################################# Generate the group table for the 48 cube symmetries ################################
-# mult_sym = np.empty([N_SYM, N_SYM], dtype=np.uint8)
-# for i in range(N_SYM):
-#     for j in range(N_SYM):
-#         cc = cb.CubieCube(symCube[i].cp, symCube[i].co, symCube[i].ep, symCube[i].eo)
-#         cc.multiply(symCube[j])
-#         for k in range(N_SYM):
-#             if cc == symCube[k]:  # SymCube[i]*SymCube[j] == SymCube[k]
-#                 mult_sym[i][j] = k
-#                 break
-mult_sym = ar.array('H', [0] * (N_SYM * N_SYM))
+mult_sym = ar.array('B', [0] * (N_SYM * N_SYM))
 for i in range(N_SYM):
     for j in range(N_SYM):
         cc = cb.CubieCube(symCube[i].cp, symCube[i].co, symCube[i].ep, symCube[i].eo)
@@ -93,17 +84,6 @@ for i in range(N_SYM):
                 mult_sym[N_SYM * i + j] = k
                 break
 ########################################################################################################################
-
-# #### Generate the table for the conjugation of a move m by a symmetry s. conj_move[m, s] = s*m*s^-1 ##################
-# conj_move = np.empty([N_MOVE, N_SYM], dtype=np.uint8)
-# for s in range(N_SYM):
-#     for m in Mv:
-#         ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # copy cube
-#         ss.multiply(cb.moveCube[m])  # s*m
-#         ss.multiply(symCube[inv_idx[s]])  # s*m*s^-1
-#         for m2 in Mv:
-#             if ss == cb.moveCube[m2]:
-#                 conj_move[m][s] = m2
 
 # #### Generate the table for the conjugation of a move m by a symmetry s. conj_move[N_MOVE*s + m] = s*m*s^-1 ##########
 conj_move = ar.array('H', [0] * (N_MOVE * N_SYM))

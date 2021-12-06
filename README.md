@@ -7,9 +7,7 @@ If you just want to solve Rubik's cube and play around with its patterns [Cube E
 
 The package is published on PyPI and can be installed with
 
-```$ pip install RubikTwoPhase``` 
-
-```$ pip install numpy``` is necessary too if the numpy package is not installed in your environment.
+```$ pip install RubikTwoPhase```
 
 Once installed, you can import the module twophase.solver into your code:
 ```python
@@ -85,7 +83,10 @@ You also can communicate with the server with a little GUI program which allows 
 
 ***
 The following module is experimental. It uses the OpenCV package which eventually has to be installed with   
-```$ pip install opencv-python```.   
+```$ pip install opencv-python```  
+You also need the numpy package which can be installed with   
+```$ pip install numpy```   
+
 The webserver has to run and a webcam must be connected to the client.
 ```python
 >>> import twophase.computer_vision

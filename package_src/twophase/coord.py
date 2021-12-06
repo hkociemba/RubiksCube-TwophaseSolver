@@ -17,12 +17,15 @@ u_edges_plus_d_edges_to_ud_edges = None  # global variable
 
 class CoordCube:
     """Represent a cube on the coordinate level.
-    
-    In phase 1 a state is uniquely determined by the three coordinates flip, twist and slice.
-    In phase 2 a state is uniquely determined by the three coordinates corners, ud_edges and slice_sorted.
+    In phase 1 a state is uniquely determined by the three coordinates flip, twist and slice = slicesorted // 24.
+    In phase 2 a state is uniquely determined by the three coordinates corners, ud_edges and slice_sorted % 24.
     """
 
     def __init__(self, cc=None):
+        """
+        Create cube on coordinate level from Id-cube of from CubieCube
+        :param cc: The CubieCube
+        """
         if cc is None:
             self.twist = SOLVED  # twist of corners
             self.flip = SOLVED  # flip of edges
@@ -63,6 +66,10 @@ class CoordCube:
         return s
 
     def phase1_move(self, m):
+        """
+        Update phase 1 coordinates when move is applied.
+        :param m: The move
+        """
         self.twist = mv.twist_move[N_MOVE * self.twist + m]
         self.flip = mv.flip_move[N_MOVE * self.flip + m]
         self.slice_sorted = mv.slice_sorted_move[N_MOVE * self.slice_sorted + m]
@@ -80,11 +87,20 @@ class CoordCube:
         self.corner_rep = sy.corner_rep[self.corner_classidx]
 
     def phase2_move(self, m):
+        """
+        Update phase 2 coordinates when move is applied.
+        :param m: The move
+        """
         self.slice_sorted = mv.slice_sorted_move[N_MOVE * self.slice_sorted + m]
         self.corners = mv.corners_move[N_MOVE * self.corners + m]
         self.ud_edges = mv.ud_edges_move[N_MOVE * self.ud_edges + m]
 
     def get_depth_phase1(self):
+        """
+        Compute the distance to the cube subgroup H where flip=slice=twist=0
+        :param position: The current cube state
+        :return: The distance to H
+        """
         slice_ = self.slice_sorted // N_PERM_4
         flip = self.flip
         twist = self.twist
@@ -116,7 +132,13 @@ class CoordCube:
 
     @staticmethod
     def get_depth_phase2(corners, ud_edges):
-        # the slice coordinate is not included
+        """
+        Get distance to subgroup where only the UD-slice edges may be permuted in their slice (only 24/2 = 12 possible
+        ways due to overall even parity). This is a lower bound for the number of moves to solve phase 2.
+        :param corners: Corners coordinate
+        :param ud_edges: Coordinate of the 8 edges of U and D face.
+        :return:
+        """
         classidx = sy.corner_classidx[corners]
         sym = sy.corner_sym[corners]
         depth_mod3 = pr.get_corners_ud_edges_depth3(N_UD_EDGES * classidx + sy.ud_edges_conj[(ud_edges << 4) + sym])
@@ -193,8 +215,6 @@ def create_phase2_edgemerge_table():
         fh = open(fname, "rb")
         u_edges_plus_d_edges_to_ud_edges = ar.array('H')
         u_edges_plus_d_edges_to_ud_edges.fromfile(fh, N_U_EDGES_PHASE2 * N_PERM_4)
-
-
 ########################################################################################################################
 
 

@@ -7,8 +7,6 @@ from tkinter import *
 import socket
 import face
 import cubie
-from threading import Thread
-from vision2 import grab_colors
 import vision_params
 
 

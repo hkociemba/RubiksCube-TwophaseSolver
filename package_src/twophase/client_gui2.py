@@ -7,8 +7,6 @@ from tkinter import *
 import socket
 import twophase.face
 import twophase.cubie as cubie
-from threading import Thread
-from twophase.vision2 import grab_colors
 import twophase.vision_params as vision_params
 
 
