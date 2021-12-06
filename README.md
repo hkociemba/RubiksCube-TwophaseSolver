@@ -78,10 +78,10 @@ You also can communicate with the server with a little GUI program which allows 
 ```python
 >>> import twophase.client_gui
 ```
-
 ![](gui_client.jpg "")
-
 ***
+
+
 The following module is experimental. It uses the OpenCV package which eventually has to be installed with   
 ```$ pip install opencv-python```  
 You also need the numpy package which can be installed with   
@@ -96,3 +96,31 @@ You have the possibility to enter the facelet colors with a webcam. There are se
 
 You can find some more information how to set the parameters here:
 [Computer vision and Rubik's cube](http://kociemba.org/computervision.html)
+
+***
+
+## Performance
+
+We solved 1000 random cubes in different scenarios. All computations were done on a Windows 10 machine with an
+AMD Ryzen 7 3700X 3.59 GHz.   
+We distinguish between computations with the standard CPython interpreter and computation with PyPy (pypy3) which
+includes a Just-in-Time compiler which gives a speedup by a factor of about 10.
+
+test(1000, t) generates 1000 random cubes, the computing time for each cube is t seconds. The distribution of the
+solving lengths also given.
+
+#### Standard CPython
+test(1000,30): {14: 0, 15: 2, 16: 12, 17: 74, 18: 279, 19: 534, 20: 99, 21: 0}, average 18.63 moves  
+test(1000,10): {14: 0, 15: 1, 16: 8, 17: 51, 18: 242, 19: 532, 20: 166, 21: 0}, average 18.79 moves  
+test(1000,1): {14: 0, 15: 2, 16: 4, 17: 28, 18: 127, 19: 401, 20: 405, 21: 33, 22: 0}, average 19.27 moves  
+test(1000,0.1): {15: 0, 16: 2, 17: 6, 18: 46, 19: 186, 20: 451, 21: 293, 22: 16, 23: 0}, average 20.02 moves  
+
+#### PyPy (pypy3) with Just-in-Time compiler
+test(1000,10): {14: 0, 15: 1, 16: 11, 17: 100, 18: 423, 19: 433, 20: 32, 21: 0}, average 18.37 moves  
+test(1000,1): {14: 0, 15: 1, 16: 10, 17: 49, 18: 259, 19: 535, 20: 145, 21: 1, 22: 0}, average 18.76 moves  
+test(1000,0.1): {15: 0, 16: 4, 17: 23, 18: 100, 19: 429, 20: 401, 21: 43, 22: 0}, average 19.33 moves  
+test(1000,0.01): {16: 0, 17: 1, 18: 25, 19: 95, 20: 349, 21: 461, 22: 69, 23: 0}, average 20.45 moves  
+
+
+To achieve an average of less than 19 moves a computing time of 10 s in case of CPython or 1 s in case of PyPy is
+sufficient.

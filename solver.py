@@ -4,7 +4,7 @@ import threading as thr
 import cubie
 import symmetries as sy
 import coord
-from twophase.enums import Move
+from enums import Move
 import moves as mv
 import pruning as pr
 import time
