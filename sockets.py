@@ -64,4 +64,3 @@ def server_start(args):
         print('Connected with ' + addr[0] + ':' + str(addr[1]) + ', ' + time.strftime("%Y.%m.%d  %H:%M:%S"))
         threading.Thread(target=client_thread, args=(conn, int(args[2]), int(args[3]))).start()
     s.close()
-

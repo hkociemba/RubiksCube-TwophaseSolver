@@ -98,7 +98,6 @@ class CoordCube:
     def get_depth_phase1(self):
         """
         Compute the distance to the cube subgroup H where flip=slice=twist=0
-        :param position: The current cube state
         :return: The distance to H
         """
         slice_ = self.slice_sorted // N_PERM_4
@@ -155,8 +154,8 @@ class CoordCube:
                 ud_edges1 = mv.ud_edges_move[N_MOVE * ud_edges + m]
                 classidx1 = sy.corner_classidx[corners1]
                 sym = sy.corner_sym[corners1]
-                if pr.get_corners_ud_edges_depth3(N_UD_EDGES * classidx1 + sy.ud_edges_conj[(ud_edges1 << 4) + sym]) == \
-                        depth_mod3 - 1:
+                if pr.get_corners_ud_edges_depth3(
+                        N_UD_EDGES * classidx1 + sy.ud_edges_conj[(ud_edges1 << 4) + sym]) == depth_mod3 - 1:
                     depth += 1
                     corners = corners1
                     ud_edges = ud_edges1
@@ -179,7 +178,7 @@ def create_phase2_edgemerge_table():
     if not path.isfile(fname):
         cnt = 0
         print("creating " + fname + " table...")
-        u_edges_plus_d_edges_to_ud_edges = ar.array('H', [0 for i in range(N_U_EDGES_PHASE2 * N_PERM_4)])
+        u_edges_plus_d_edges_to_ud_edges = ar.array('H', [0 for _ in range(N_U_EDGES_PHASE2 * N_PERM_4)])
         for i in range(N_U_EDGES_PHASE2):
             c_u.set_u_edges(i)
             for j in range(N_CHOOSE_8_4):
@@ -215,6 +214,8 @@ def create_phase2_edgemerge_table():
         fh = open(fname, "rb")
         u_edges_plus_d_edges_to_ud_edges = ar.array('H')
         u_edges_plus_d_edges_to_ud_edges.fromfile(fh, N_U_EDGES_PHASE2 * N_PERM_4)
+
+
 ########################################################################################################################
 
 

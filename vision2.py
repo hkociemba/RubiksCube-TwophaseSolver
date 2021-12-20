@@ -11,6 +11,7 @@ grid_N = 25  # number of grid-squares in vertical direction
 
 (major, minor, _) = cv2.__version__.split(".")
 
+
 def drawgrid(img, n):
     """Draw grid onto the webcam output. Only used for debugging purposes."""
     h, w = img.shape[:2]
@@ -153,10 +154,10 @@ def getcolor(p):
 
 def getcolors(co, ed, aco, aed, m):
     """Find the colors of the 9 facelets and decide their position on the cube face."""
-    centers = [[m for x in range(3)] for x in range(3)]
-    colors = [['' for x in range(3)] for x in range(3)]
+    centers = [[m for _ in range(3)] for _ in range(3)]
+    colors = [['' for _ in range(3)] for _ in range(3)]
     s = np.array([0., 0., 0.])
-    hsvs = [[s for x in range(3)] for x in range(3)]
+    hsvs = [[s for _ in range(3)] for _ in range(3)]
     cocents = co + aco
     if len(cocents) != 4:
         return [], []
@@ -228,7 +229,7 @@ def find_squares(bgrcap, n):
                                    (255, vision_params.sat_W, 255))
                 # and OR it to the white_mask
                 white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
-                cv2.bitwise_or(mask, white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
+                    cv2.bitwise_or(mask, white_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
 
             # similar procedure for the color mask. Some issues because hues are computed modulo 180
             if sigma < vision_params.sigma_C:
@@ -244,9 +245,9 @@ def find_squares(bgrcap, n):
                 color_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz] = \
                     cv2.bitwise_or(mask, color_mask[y - 1 * sz:y + 2 * sz, x - 1 * sz:x + 2 * sz])
 
-    maxs = 120 # hardcoded max value for "black" saturation
-    black_mask = cv2.inRange(cv2.cvtColor(bgrcap,cv2.COLOR_BGR2HSV), (0, 0, 0), (179, maxs, vision_params.rgb_L))
-    #black_mask = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))
+    maxs = 120  # hardcoded max value for "black" saturation
+    black_mask = cv2.inRange(cv2.cvtColor(bgrcap, cv2.COLOR_BGR2HSV), (0, 0, 0), (179, maxs, vision_params.rgb_L))
+    # black_mask = cv2.inRange(bgrcap, (0, 0, 0), (vision_params.rgb_L, vision_params.rgb_L, vision_params.rgb_L))
 
     black_mask = cv2.bitwise_not(black_mask)
 
@@ -288,8 +289,9 @@ def find_squares(bgrcap, n):
 
             # cv2.drawContours(bgrcap, [approx], -1, (0, 0, 255), 8)
             middle = np.sum(corners, axis=0) / 4  # store the center of the potential facelet
-            #cent.append(np.asarray(middle))
+            # cent.append(np.asarray(middle))
             cent.append(middle)
+
 
 def grab_colors():
     """Find the cube in the webcam picture and grab the colors of the facelets."""
@@ -347,7 +349,7 @@ def grab_colors():
         # the results supplied by getcolors are used in client_gui2.py for the "Webcam import"
         vision_params.face_hsv, vision_params.face_col = getcolors(cf, ef, acf, aef, m)
 
-        #drawgrid(bgrcap, grid_N)
+        # drawgrid(bgrcap, grid_N)
 
         # show the windows
         cv2.imshow('color_filter mask', cv2.resize(color_mask, (width // 2, height // 2)))

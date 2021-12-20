@@ -2,7 +2,7 @@
 
 from twophase.defs import cornerFacelet, edgeFacelet, cornerColor, edgeColor
 from twophase.enums import Color, Corner, Edge
-from twophase.cubie import CubieCube
+import twophase.cubie
 
 
 class FaceCube:
@@ -56,7 +56,6 @@ class FaceCube:
         else:
             return 'Error: Cube definition string ' + s + ' does not contain exactly 9 facelets of each color.'
 
-
     def to_string(self):
         """Give a string representation of the facelet cube."""
         s = ''
@@ -86,11 +85,12 @@ class FaceCube:
 
     def to_cubie_cube(self):
         """Return a cubie representation of the facelet cube."""
-        cc = CubieCube()
+        cc = twophase.cubie.CubieCube()
         cc.cp = [-1] * 8  # invalidate corner and edge permutation
         cc.ep = [-1] * 12
         for i in Corner:
             fac = cornerFacelet[i]  # facelets of corner  at position i
+            ori = 0
             for ori in range(3):
                 if self.f[fac[ori]] == Color.U or self.f[fac[ori]] == Color.D:
                     break

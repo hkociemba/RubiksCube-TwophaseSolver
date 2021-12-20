@@ -107,7 +107,7 @@ We distinguish between computations with the standard CPython interpreter and co
 includes a Just-in-Time compiler which gives a speedup by a factor of about 10.
 
 test(1000, t) generates 1000 random cubes, the computing time for each cube is t seconds. The distribution of the
-solving lengths also are given.
+solving lengths also is given.
 
 #### Standard CPython
 test(1000,30): {14: 0, 15: 2, 16: 12, 17: 74, 18: 279, 19: 534, 20: 99, 21: 0}, average 18.63 moves  

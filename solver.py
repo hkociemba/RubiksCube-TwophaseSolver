@@ -127,7 +127,7 @@ class SolverThread(thr.Thread):
 
             # new solution must be shorter and we do not use phase 2 maneuvers with length > 11 - 1 = 10
             togo2_limit = min(self.shortest_length[0] - len(self.sofar_phase1), 11)
-            if pr.cornslice_depth[24 * corners + slice_sorted] >= togo2_limit: # this precheck speeds up the computation
+            if pr.cornslice_depth[24 * corners + slice_sorted] >= togo2_limit:  # precheck speeds up the computation
                 return
 
             u_edges = self.co_cube.u_edges
@@ -196,7 +196,7 @@ class SolverThread(thr.Thread):
         for togo1 in range(dist, 20):  # iterative deepening, solution has at least dist moves
             self.sofar_phase1 = []
             self.search(self.co_cube.flip, self.co_cube.twist, self.co_cube.slice_sorted, dist, togo1)
-#################################End class SolverThread#################################################################
+# ################################End class SolverThread################################################################
 
 
 def solve(cubestring, max_length=20, timeout=3):
@@ -243,7 +243,8 @@ def solve(cubestring, max_length=20, timeout=3):
     return s + '(' + str(len(s)//3) + 'f)'
 ########################################################################################################################
 
-def solveto(cubestring,goalstring, max_length=20, timeout=3):
+
+def solveto(cubestring, goalstring, max_length=20, timeout=3):
     """Solve a cube defined by cubstring to a position defined by goalstring.
      :param cubestring: The format of the string is given in the Facelet class defined in the file enums.py
      :param goalstring: The format of the string is given in the Facelet class defined in the file enums.py
@@ -271,7 +272,6 @@ def solveto(cubestring,goalstring, max_length=20, timeout=3):
     cc = cubie.CubieCube()
     ccg.inv_cubie_cube(cc)
     cc.multiply(cc0)
-
 
     my_threads = []
     s_time = time.monotonic()

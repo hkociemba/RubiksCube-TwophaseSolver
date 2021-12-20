@@ -2,7 +2,6 @@
 
 from tkinter import *
 import socket
-import twophase.face
 import twophase.cubie as cubie
 
 
@@ -89,20 +88,20 @@ def solve():
         return
     try:
         s.connect((remote_ip, port))
-    except:
-        show_text('Cannot connect to server!')
+    except BaseException as e:
+        show_text('Cannot connect to server! ' + e.__doc__)
         return
     show_text('Connected with ' + remote_ip + '\n')
     try:
-        defstr = get_definition_string()+'\n'
-    except:
-        show_text('Invalid facelet configuration.\nWrong or missing colors.')
+        defstr = get_definition_string() + '\n'
+    except BaseException as e:
+        show_text('Invalid facelet configuration.\nWrong or missing colors. ' + e.__doc__)
         return
     show_text(defstr)
     try:
-        s.sendall((defstr+'\n').encode())
-    except:
-        show_text('Cannot send cube configuration to server.')
+        s.sendall((defstr + '\n').encode())
+    except BaseException as e:
+        show_text('Cannot send cube configuration to server. ' + e.__doc__)
         return
     show_text(s.recv(2048).decode())
 ########################################################################################################################
@@ -136,14 +135,14 @@ def random():
     for f in range(6):
         for row in range(3):
             for col in range(3):
-                canvas.itemconfig(facelet_id[f][row][col], fill=cols[fc.f[idx]] )
+                canvas.itemconfig(facelet_id[f][row][col], fill=cols[fc.f[idx]])
                 idx += 1
 ########################################################################################################################
 
 # ################################### Edit the facelet colors ##########################################################
 
 
-def click(event):
+def click(_event):
     """Define how to react on left mouse clicks."""
     global curcol
     idlist = canvas.find_withtag("current")
@@ -158,6 +157,8 @@ def click(event):
 ########################################################################################################################
 
 #  ###################################### Generate and display the TK_widgets ##########################################
+
+
 root = Tk()
 root.wm_title("Solver Client")
 canvas = Canvas(root, width=12 * width + 20, height=9 * width + 20)
@@ -186,4 +187,3 @@ create_facelet_rects(width)
 create_colorpick_rects(width)
 root.mainloop()
 ########################################################################################################################
-

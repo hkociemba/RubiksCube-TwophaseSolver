@@ -274,7 +274,7 @@ class CubieCube:
 
     def get_slice_sorted(self):
         """Get the permutation and location of the UD-slice edges FR,FL,BL and BR.
-            0 <= slice_sorted < 11880 in phase 1, 0 <= slice_sorted < 24 in phase 2, slice_sorted = 0 for solved cube."""
+        0 <= slice_sorted < 11880 in phase 1, 0 <= slice_sorted < 24 in phase 2, slice_sorted = 0 for solved cube."""
         a = x = 0
         edge4 = [0]*4
         # First compute the index a < (12 choose 4) and the permutation array perm.
@@ -539,7 +539,9 @@ class CubieCube:
 ########################################################################################################################
 
 # ################################## these cubes represent the basic cube moves ########################################
-basicMoveCube = [0] * 6
+
+
+basicMoveCube = [CubieCube()] * 6
 basicMoveCube[Color.U] = CubieCube(cpU, coU, epU, eoU)
 basicMoveCube[Color.R] = CubieCube(cpR, coR, epR, eoR)
 basicMoveCube[Color.F] = CubieCube(cpF, coF, epF, eoF)
@@ -550,7 +552,7 @@ basicMoveCube[Color.B] = CubieCube(cpB, coB, epB, eoB)
 
 # ################################# these cubes represent the all 18 cube moves ########################################
 
-moveCube = [0] * 18
+moveCube = [CubieCube()] * 18
 for c1 in Color:
     cc = CubieCube()
     for k1 in range(3):

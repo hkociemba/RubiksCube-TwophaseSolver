@@ -1,6 +1,5 @@
 import solver as sv
 import cubie
-import face
 
 
 def test(n, t):
@@ -10,7 +9,6 @@ def test(n, t):
     :return: A dictioneary with the solving statistics
     """
     cc = cubie.CubieCube()
-    fc = face.FaceCube()
     cnt = [0] * 31
     for i in range(n):
         cc.randomize()
@@ -33,7 +31,7 @@ def test(n, t):
 # test(1000,30): {14: 0, 15: 2, 16: 12, 17: 74, 18: 279, 19: 534, 20: 99, 21: 0}, average 18.63 moves
 # test(1000,10): {14: 0, 15: 1, 16: 8, 17: 51, 18: 242, 19: 532, 20: 166, 21: 0}, average 18.79 moves
 # test(1000,1): {14: 0, 15: 2, 16: 4, 17: 28, 18: 127, 19: 401, 20: 405, 21: 33, 22: 0}, average 19.27 moves
-# test(10000,1): {13: 0, 14: 1, 15: 2, 16: 54, 17: 251, 18: 1295, 19: 4047, 20: 4004, 21: 346, 22: 0}, average 19.27 moves
+# test(10000,1): {13: 0, 14: 1, 15: 2, 16: 54, 17: 251, 18: 1295, 19: 4047, 20: 4004, 21: 346, 22: 0}, avrg 19.27 moves
 # test(1000,0.1): {15: 0, 16: 2, 17: 6, 18: 46, 19: 186, 20: 451, 21: 293, 22: 16, 23: 0}, average 20.02 moves
 
 # PyPy (pypy3) with Just-in-Time compiler

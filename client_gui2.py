@@ -5,12 +5,9 @@
 
 from tkinter import *
 import socket
-import face
 import cubie
 import vision_params
 
-
-import numpy as np
 
 # ################################## some global variables and constants ###############################################
 DEFAULT_HOST = 'localhost'
@@ -21,8 +18,6 @@ colorpick_id = [0 for i in range(6)]
 curcol = None
 t = ("U", "R", "F", "D", "L", "B")
 cols = ("yellow", "green", "red", "white", "blue", "orange")
-
-
 ########################################################################################################################
 
 # ################################################ Diverse functions ###################################################
@@ -73,8 +68,6 @@ def get_definition_string():
             for col in range(3):
                 s += color_to_facelet[canvas.itemcget(facelet_id[f][row][col], "fill")]
     return s
-
-
 ########################################################################################################################
 
 # ############################### Solve the displayed cube with a local or remote server ###############################
@@ -99,24 +92,22 @@ def solve():
         return
     try:
         s.connect((remote_ip, port))
-    except:
-        show_text('Cannot connect to server!')
+    except BaseException as e:
+        show_text('Cannot connect to server! ' + e.__doc__)
         return
     show_text('Connected with ' + remote_ip + '\n')
     try:
         defstr = get_definition_string() + '\n'
-    except:
-        show_text('Invalid facelet configuration.\nWrong or missing colors.')
+    except BaseException as e:
+        show_text('Invalid facelet configuration.\nWrong or missing colors. ' + e.__doc__)
         return
     show_text(defstr)
     try:
         s.sendall((defstr + '\n').encode())
-    except:
-        show_text('Cannot send cube configuration to server.')
+    except BaseException as e:
+        show_text('Cannot send cube configuration to server. ' + e.__doc__)
         return
     show_text(s.recv(2048).decode())
-
-
 ########################################################################################################################
 
 # ################################# Functions to change the facelet colors #############################################
@@ -150,14 +141,12 @@ def random():
             for col in range(3):
                 canvas.itemconfig(facelet_id[f][row][col], fill=cols[fc.f[idx]])
                 idx += 1
-
-
 ########################################################################################################################
 
 # ################################### Edit the facelet colors ##########################################################
 
 
-def click(event):
+def click(_event):
     """Define how to react on left mouse clicks"""
     global curcol
     idlist = canvas.find_withtag("current")
@@ -169,8 +158,6 @@ def click(event):
             canvas.itemconfig("current", width=5)
         else:
             canvas.itemconfig("current", fill=curcol)
-
-
 ########################################################################################################################
 
 
@@ -230,10 +217,10 @@ def transfer():
     for i in range(3):
         for j in range(3):
             canvas.itemconfig(facelet_id[dc[centercol]][i][j], fill=vision_params.face_col[i][j])
-
 # ######################################################################################################################
 
 #  ###################################### Generate and display the TK_widgets ##########################################
+
 
 root = Tk()
 root.wm_title("Solver Client")
@@ -316,5 +303,4 @@ canvas.create_window(10 + 0.5 * width, 10 + 2.1 * width, anchor=NW, window=btran
 
 
 root.mainloop()
-
 ########################################################################################################################

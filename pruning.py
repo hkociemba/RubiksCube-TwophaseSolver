@@ -7,11 +7,10 @@ import moves as mv
 import symmetries as sy
 import cubie as cb
 from os import path
-import time
 import array as ar
 
-flipslice_twist_depth3 = None  # global variables, initialized during pruning table cration
-corners_ud_edges_depth3 = None
+flipslice_twist_depth3 = ar.array('L')  # global variables, initialized during pruning table cration
+corners_ud_edges_depth3 = ar.array('L')
 cornslice_depth = None
 edgeslice_depth = None
 
@@ -138,10 +137,10 @@ def create_phase1_prun_table():
                                     # ####symmetric position has eventually more than one representation ###############
                                     sym = fs_sym[fs1_classidx]
                                     if sym != 1:
-                                        for j in range(1, 16):
+                                        for k in range(1, 16):
                                             sym >>= 1
                                             if sym % 2 == 1:
-                                                twist2 = sy.twist_conj[(twist1 << 4) + j]
+                                                twist2 = sy.twist_conj[(twist1 << 4) + k]
                                                 # fs2_classidx = fs1_classidx due to symmetry
                                                 idx2 = 2187 * fs1_classidx + twist2
                                                 if get_flipslice_twist_depth3(idx2) == 3:
@@ -287,7 +286,6 @@ def create_phase2_cornsliceprun_table():
         cornslice_depth[defs.N_PERM_4 * corners + slice_] = 0
         done = 1
         depth = 0
-        idx = 0
         while done != defs.N_CORNERS * defs.N_PERM_4:
             for corners in range(defs.N_CORNERS):
                 for slice_ in range(defs.N_PERM_4):
@@ -316,6 +314,8 @@ def create_phase2_cornsliceprun_table():
 
 # array distance computes the new distance from the old_distance i and the new_distance_mod3 j. ########################
 # We need this array because the pruning tables only store the distances mod 3. ########################################
+
+
 distance = ar.array('b', [0 for i in range(60)])
 for i in range(20):
     for j in range(3):
