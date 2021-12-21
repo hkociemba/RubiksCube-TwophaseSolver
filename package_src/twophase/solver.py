@@ -8,7 +8,7 @@ from twophase.enums import Move
 import twophase.moves as mv
 import twophase.pruning as pr
 import time
-from defs import N_MOVE
+from twophase.defs import N_MOVE
 
 
 class SolverThread(thr.Thread):
