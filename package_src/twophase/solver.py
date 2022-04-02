@@ -37,6 +37,7 @@ class SolverThread(thr.Thread):
         self.inv = inv
         self.sofar_phase1 = None
         self.sofar_phase2 = None
+        self.phase2_done = False
         self.lock = thr.Lock()
         self.ret_length = ret_length
         self.timeout = timeout
@@ -51,7 +52,7 @@ class SolverThread(thr.Thread):
 
     def search_phase2(self, corners, ud_edges, slice_sorted, dist, togo_phase2):
         # ##############################################################################################################
-        if self.terminated.is_set():
+        if self.terminated.is_set() or self.phase2_done:
             return
         ################################################################################################################
         if togo_phase2 == 0 and slice_sorted == 0:
@@ -69,6 +70,7 @@ class SolverThread(thr.Thread):
             if self.shortest_length[0] <= self.ret_length:  # we have reached the target length
                 self.terminated.set()
             self.lock.release()
+            self.phase2_done = True
         else:
             for m in Move:
                 if m in [Move.R1, Move.R3, Move.F1, Move.F3,
@@ -140,7 +142,10 @@ class SolverThread(thr.Thread):
             dist2 = self.co_cube.get_depth_phase2(corners, ud_edges)
             for togo2 in range(dist2, togo2_limit):  # do not use more than togo2_limit - 1 moves in phase 2
                 self.sofar_phase2 = []
+                self.phase2_done = False
                 self.search_phase2(corners, ud_edges, slice_sorted, dist2, togo2)
+                if self.phase2_done:  # solution already found
+                    break
 
         else:
             for m in Move:
@@ -219,7 +224,7 @@ def solve(cubestring, max_length=20, timeout=3):
     s_time = time.monotonic()
 
     # these mutable variables are modidified by all six threads
-    s_length = [999]
+    shortest_length = [999]
     solutions = []
     terminated = thr.Event()
     terminated.clear()
@@ -231,7 +236,7 @@ def solve(cubestring, max_length=20, timeout=3):
     if len(list(set(range(48, 96)) & set(syms))) > 0:  # we have some antisymmetry so we do not search the inverses
         tr = list(filter(lambda x: x < 3, tr))
     for i in tr:
-        th = SolverThread(cc, i % 3, i // 3, max_length, timeout, s_time, solutions, terminated, [999])
+        th = SolverThread(cc, i % 3, i // 3, max_length, timeout, s_time, solutions, terminated, shortest_length)
         my_threads.append(th)
         th.start()
     for t in my_threads:

@@ -243,10 +243,10 @@ def create_phase2_prun_table():
                                 # ######symmetric position has eventually more than one representation #############
                                 sym = c_sym[c1_classidx]
                                 if sym != 1:
-                                    for j in range(1, 16):
+                                    for k in range(1, 16):
                                         sym >>= 1
                                         if sym % 2 == 1:
-                                            ud_edge2 = sy.ud_edges_conj[(ud_edge1 << 4) + j]
+                                            ud_edge2 = sy.ud_edges_conj[(ud_edge1 << 4) + k]
                                             # c1_classidx does not change
                                             idx2 = 40320 * c1_classidx + ud_edge2
                                             if get_corners_ud_edges_depth3(idx2) == 3:

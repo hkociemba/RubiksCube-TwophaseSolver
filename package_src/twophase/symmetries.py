@@ -94,7 +94,7 @@ for s in range(N_SYM):
         ss.multiply(symCube[inv_idx[s]])  # s*m*s^-1
         for m2 in Mv:
             if ss == cb.moveCube[m2]:
-                conj_move[N_MOVE*s + m] = m2
+                conj_move[N_MOVE * s + m] = m2
 ########################################################################################################################
 
 # ###### Generate the phase 1 table for the conjugation of the twist t by a symmetry s. twist_conj[t, s] = s*t*s^-1 ####
@@ -268,7 +268,7 @@ else:
 
     fh = open(fname1, 'rb')
     corner_classidx = ar.array('H')
-    corner_classidx.fromfile(fh,N_CORNERS)
+    corner_classidx.fromfile(fh, N_CORNERS)
     fh.close()
     fh = open(fname2, 'rb')
     corner_sym = ar.array('B')
