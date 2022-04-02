@@ -201,6 +201,8 @@ class SolverThread(thr.Thread):
         for togo1 in range(dist, 20):  # iterative deepening, solution has at least dist moves
             self.sofar_phase1 = []
             self.search(self.co_cube.flip, self.co_cube.twist, self.co_cube.slice_sorted, dist, togo1)
+
+
 # ################################End class SolverThread################################################################
 
 
@@ -245,7 +247,9 @@ def solve(cubestring, max_length=20, timeout=3):
     if len(solutions) > 0:
         for m in solutions[-1]:  # the last solution is the shortest
             s += m.name + ' '
-    return s + '(' + str(len(s)//3) + 'f)'
+    return s + '(' + str(len(s) // 3) + 'f)'
+
+
 ########################################################################################################################
 
 
@@ -303,5 +307,5 @@ def solveto(cubestring, goalstring, max_length=20, timeout=3):
     if len(solutions) > 0:
         for m in solutions[-1]:  # the last solution is the shortest
             s += m.name + ' '
-    return s + '(' + str(len(s)//3) + 'f)'
+    return s + '(' + str(len(s) // 3) + 'f)'
 ########################################################################################################################

@@ -119,6 +119,10 @@ class SolverThread(thr.Thread):
             else:
                 m = Move.U1  # value is irrelevant here, no phase 1 moves
 
+            if m in [Move.R3, Move.F3, Move.L3, Move.B3]:  # phase 1 solution come in pairs
+                corners = mv.corners_move[18 * self.cornersave + m - 1]  # apply R2, F2, L2 ord B2 on last ph1 solution
+            else:
+                corners = self.co_cube.corners
                 for m in self.sofar_phase1:  # get current corner configuration
                     corners = mv.corners_move[18 * corners + m]
                 self.cornersave = corners
@@ -197,6 +201,8 @@ class SolverThread(thr.Thread):
         for togo1 in range(dist, 20):  # iterative deepening, solution has at least dist moves
             self.sofar_phase1 = []
             self.search(self.co_cube.flip, self.co_cube.twist, self.co_cube.slice_sorted, dist, togo1)
+
+
 # ################################End class SolverThread################################################################
 
 
@@ -241,7 +247,9 @@ def solve(cubestring, max_length=20, timeout=3):
     if len(solutions) > 0:
         for m in solutions[-1]:  # the last solution is the shortest
             s += m.name + ' '
-    return s + '(' + str(len(s)//3) + 'f)'
+    return s + '(' + str(len(s) // 3) + 'f)'
+
+
 ########################################################################################################################
 
 
@@ -299,5 +307,5 @@ def solveto(cubestring, goalstring, max_length=20, timeout=3):
     if len(solutions) > 0:
         for m in solutions[-1]:  # the last solution is the shortest
             s += m.name + ' '
-    return s + '(' + str(len(s)//3) + 'f)'
+    return s + '(' + str(len(s) // 3) + 'f)'
 ########################################################################################################################
