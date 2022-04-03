@@ -53,8 +53,15 @@ will grant for example 0.1 s to find a solution with <= 20 moves.
 Another feature is to locally start a server which listens on a port of your choice. It accepts the cube definition string and returns the solution.
 ```python
 >>> import twophase.server as srv
->>> srv.start(8080,20,2)
-```   
+>>> srv.start(8080, 20, 2)
+```
+Alternatively start the server in background:
+```python
+>>> import twophase.start_server as ss
+>>> from threading import Thread
+>>> bg = Thread(target=ss.start, args=(8080, 20, 2))
+>>> bg.start()
+```
 If you get a   
 
 ```Server socket created```  

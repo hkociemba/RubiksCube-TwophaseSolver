@@ -211,6 +211,7 @@ def create_phase2_edgemerge_table():
         fh.close()
         print()
     else:
+        print("loading " + fname + " table...")
         fh = open(path.join(FOLDER, fname), "rb")
         u_edges_plus_d_edges_to_ud_edges = ar.array('H')
         u_edges_plus_d_edges_to_ud_edges.fromfile(fh, N_U_EDGES_PHASE2 * N_PERM_4)
