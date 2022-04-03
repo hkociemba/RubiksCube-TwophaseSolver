@@ -8,7 +8,7 @@ import enums
 import moves as mv
 import pruning as pr
 import symmetries as sy
-from defs import N_U_EDGES_PHASE2, N_PERM_4, N_CHOOSE_8_4, N_FLIP, N_TWIST, N_UD_EDGES, N_MOVE
+from defs import FOLDER, N_U_EDGES_PHASE2, N_PERM_4, N_CHOOSE_8_4, N_FLIP, N_TWIST, N_UD_EDGES, N_MOVE
 from enums import Edge as Ed
 
 SOLVED = 0  # 0 is index of solved state (except for u_edges coordinate)
@@ -175,7 +175,7 @@ def create_phase2_edgemerge_table():
     edge_d = [Ed.DR, Ed.DF, Ed.DL, Ed.DB]
     edge_ud = [Ed.UR, Ed.UF, Ed.UL, Ed.UB, Ed.DR, Ed.DF, Ed.DL, Ed.DB]
 
-    if not path.isfile(fname):
+    if not path.isfile(path.join(FOLDER, fname)):
         cnt = 0
         print("creating " + fname + " table...")
         u_edges_plus_d_edges_to_ud_edges = ar.array('H', [0 for _ in range(N_U_EDGES_PHASE2 * N_PERM_4)])
@@ -206,12 +206,12 @@ def create_phase2_edgemerge_table():
                         if cnt % 2000 == 0:
                             print('.', end='', flush=True)
         print()
-        fh = open(fname, "wb")
+        fh = open(path.join(FOLDER, fname), "wb")
         u_edges_plus_d_edges_to_ud_edges.tofile(fh)
         fh.close()
         print()
     else:
-        fh = open(fname, "rb")
+        fh = open(path.join(FOLDER, fname), "rb")
         u_edges_plus_d_edges_to_ud_edges = ar.array('H')
         u_edges_plus_d_edges_to_ud_edges.fromfile(fh, N_U_EDGES_PHASE2 * N_PERM_4)
 

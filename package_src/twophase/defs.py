@@ -41,5 +41,5 @@ N_UD_EDGES = 40320  # 8! permutations of the edges in the U-face and D-face in p
 
 N_SYM = 48  # number of cube symmetries of full group Oh
 N_SYM_D4h = 16  # Number of symmetries of subgroup D4h
-FOLDER = "tablezz"  # Folder name for generated tables
+FOLDER = "twophase"  # Folder name for generated tables
 ########################################################################################################################
