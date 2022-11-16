@@ -11,8 +11,8 @@ import array as ar
 
 uint32 = 'I' if ar.array('I').itemsize >= 4 else 'L'  # type codes differ between architectures
 
-flipslice_twist_depth3 = ar.array('uint32')  # global variables, initialized during pruning table cration
-corners_ud_edges_depth3 = ar.array('uint32')
+flipslice_twist_depth3 = ar.array(uint32)  # global variables, initialized during pruning table cration
+corners_ud_edges_depth3 = ar.array(uint32)
 cornslice_depth = None
 edgeslice_depth = None
 
@@ -58,7 +58,7 @@ def create_phase1_prun_table():
         print("creating " + fname + " table...")
         print('This may take half an hour or even longer, depending on the hardware.')
 
-        flipslice_twist_depth3 = ar.array('uint32', [0xffffffff] * (total // 16 + 1))
+        flipslice_twist_depth3 = ar.array(uint32, [0xffffffff] * (total // 16 + 1))
         # #################### create table with the symmetries of the flipslice classes ###############################
         cc = cb.CubieCube()
         fs_sym = ar.array('H', [0] * defs.N_FLIPSLICE_CLASS)
@@ -167,7 +167,7 @@ def create_phase1_prun_table():
     else:
         print("loading " + fname + " table...")
         fh = open(path.join(defs.FOLDER, fname), "rb")
-        flipslice_twist_depth3 = ar.array('uint32')
+        flipslice_twist_depth3 = ar.array(uint32)
         flipslice_twist_depth3.fromfile(fh, total // 16 + 1)
     fh.close()
 
@@ -180,7 +180,7 @@ def create_phase2_prun_table():
     if not path.isfile(path.join(defs.FOLDER, fname)):
         print("creating " + fname + " table...")
 
-        corners_ud_edges_depth3 = ar.array('uint32', [0xffffffff] * (total // 16))
+        corners_ud_edges_depth3 = ar.array(uint32, [0xffffffff] * (total // 16))
         # ##################### create table with the symmetries of the corners classes ################################
         cc = cb.CubieCube()
         c_sym = ar.array('H', [0] * defs.N_CORNERS_CLASS)
@@ -269,7 +269,7 @@ def create_phase2_prun_table():
     else:
         print("loading " + fname + " table...")
         fh = open(path.join(defs.FOLDER, fname), "rb")
-        corners_ud_edges_depth3 = ar.array('uint32')
+        corners_ud_edges_depth3 = ar.array(uint32)
         corners_ud_edges_depth3.fromfile(fh, total // 16)
 
     fh.close()
