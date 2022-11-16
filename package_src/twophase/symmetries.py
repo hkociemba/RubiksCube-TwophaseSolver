@@ -8,6 +8,7 @@ from twophase.defs import FOLDER, N_TWIST, N_SYM, N_SYM_D4h, N_FLIP, N_SLICE, N_
 from twophase.enums import Corner as Co, Edge as Ed, Move as Mv, BS
 
 INVALID = 65535
+uint32 = 'I' if ar.array('I').itemsize >= 4 else 'L'  # type codes differ between architectures
 
 #  #################### Permutations and orientation changes of the basic symmetries ###################################
 
@@ -165,7 +166,7 @@ if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER,
     print("creating " + "flipslice sym-tables...")
     flipslice_classidx = ar.array('H', [INVALID] * (N_FLIP * N_SLICE))  # idx -> classidx
     flipslice_sym = ar.array('B', [0] * (N_FLIP * N_SLICE))  # idx -> symmetry
-    flipslice_rep = ar.array('L', [0] * N_FLIPSLICE_CLASS)  # classidx -> idx of representant
+    flipslice_rep = ar.array(uint32, [0] * N_FLIPSLICE_CLASS)  # classidx -> idx of representant
 
     classidx = 0
     cc = cb.CubieCube()
@@ -218,7 +219,7 @@ else:
     flipslice_sym.fromfile(fh, N_FLIP * N_SLICE)
     fh.close()
     fh = open(path.join(FOLDER, fname3), 'rb')
-    flipslice_rep = ar.array('L')
+    flipslice_rep = ar.array(uint32)
     flipslice_rep.fromfile(fh, N_FLIPSLICE_CLASS)
     fh.close()
 ########################################################################################################################
