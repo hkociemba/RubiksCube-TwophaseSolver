@@ -132,3 +132,6 @@ test(1000,0.01): {16: 0, 17: 1, 18: 25, 19: 95, 20: 349, 21: 461, 22: 69, 23: 0}
 To achieve an average of less than 19 moves a computing time of 10 s in case of CPython or 1 s in case of PyPy is
 sufficient. If you are satisfied with an average of 0.5 moves more a computation time of 1 s with CPython and 0.1 s
 with PyPy is sufficient.   
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=hkociemba/RubiksCube-TwophaseSolver&type=Date)](https://star-history.com/#hkociemba/RubiksCube-TwophaseSolver&Date)
