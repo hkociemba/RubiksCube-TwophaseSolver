@@ -1,6 +1,6 @@
 # RubiksCube-TwophaseSolver
 ## Overview 
-This project implements the fully developed of the two-phase-algorithm to solve the Rubik's Cube in Python. While Python is much slower compared to languages such as C++ or Java, the implementation is efficient enough to solve random cubes in less than 20 moves on average within a few seconds on slow hardware like the Raspberry Pi3 .
+This project implements the fully developed form of the two-phase-algorithm to solve the Rubik's Cube in Python. While Python is much slower compared to languages such as C++ or Java, the implementation is efficient enough to solve random cubes in less than 20 moves on average within a few seconds on slow hardware like the Raspberry Pi3.
 
 If you goal is simply to solve Rubik's Cube and explore its patterns [Cube Explorer](http://kociemba.org/cube.htm) might be the better choice. However, if you aim to gain a deeper understanding of the two-phase-algorithm's intricacies or if you are working on a project to construct a cube-solving robot that achieves near-optimal solutions, then this is the right resource.
 ## Usage
@@ -29,7 +29,7 @@ This will solve the cube described by the definition string with a desired maxim
 ```
 Here, U, R, F, D, L and B denote the Up, Right, Front, Down, Left and Back faces of the cube. 1, 2, and 3 denote a 90°, 180° and 270° clockwise rotation of the corresponding face. 
 
-If you prefer to allocate a constant time 't' for each solution and receive only the shortest maneuver found within that time 't', use the following command:
+If you prefer to allocate a constant time t for each solution and receive only the shortest maneuver found within that time t, use the following command:
 ```python
 >>> sv.solve(cubestring,0,t)
 ```
@@ -74,10 +74,10 @@ You can access the server, which may also run on a remote machine, using various
 via a web browser and the server on the same machine on port 8080.
 
 ```http://myserver.com:8081/DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL```  
-via a web browser and the server on the remote machine myserver.com on port 8081:
+via a web browser and the server on the remote machine myserver.com on port 8081.
 
 ```echo DUUBULDBFRBFRRULLLBRDFFFBLURDBFDFDRFRULBLUFDURRBLBDUDL | nc localhost 8080```  
-using netcat (nc) and the server on the same machine on port 8080
+using netcat (nc) and the server on the same machine on port 8080.
 
 You can also communicate with the server using a small GUI program that allows you to interactively enter the cube definition string:
 ```python
@@ -87,7 +87,7 @@ You can also communicate with the server using a small GUI program that allows y
 ***
 
 
-Please note that the following module is experimental and requires the installation of the OpenCV package, which can be done with:   
+Please note that the following module is experimental and requires the installation of the OpenCV package, which can be done with   
 ```$ pip install opencv-python```  
 Additionally, you'll need the numpy package, which can be installed with   
 ```$ pip install numpy```   
