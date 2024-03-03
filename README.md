@@ -2,7 +2,7 @@
 ## Overview 
 This project implements the fully developed form of the two-phase-algorithm to solve the Rubik's Cube in Python. While Python is much slower compared to languages such as C++ or Java, the implementation is efficient enough to solve random cubes in less than 20 moves on average within a few seconds on slow hardware like the Raspberry Pi3.
 
-If you goal is simply to solve Rubik's Cube and explore its patterns [Cube Explorer](http://kociemba.org/cube.htm) might be the better choice. However, if you aim to gain a deeper understanding of the two-phase-algorithm's intricacies or if you are working on a project to construct a cube-solving robot that achieves near-optimal solutions, then this is the right resource.
+If your goal is simply to solve Rubik's Cube and explore its patterns, [Cube Explorer](http://kociemba.org/cube.htm) might be the better choice. However, if you aim to gain a deeper understanding of the two-phase-algorithm's intricacies or if you are working on a project to construct a cube-solving robot that achieves near-optimal solutions, then this is the right resource.
 ## Usage
 
 The package is available on PyPI and can be installed with
