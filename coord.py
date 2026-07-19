@@ -1,4 +1,4 @@
-# ##### The cube on the coordinate level. It is described by a 3-tuple of natural numbers in phase 1 and phase 2. ######
+# ##### The cube at the coordinate level. It is described by a 3-tuple of natural numbers in phase 1 and phase 2. ######
 
 from os import path
 import array as ar
@@ -17,13 +17,13 @@ u_edges_plus_d_edges_to_ud_edges = None  # global variable
 
 class CoordCube:
     """Represent a cube on the coordinate level.
-    In phase 1 a state is uniquely determined by the three coordinates flip, twist and slice = slicesorted // 24.
+    In phase 1 a state is uniquely determined by the three coordinates flip, twist, and slice = slicesorted // 24.
     In phase 2 a state is uniquely determined by the three coordinates corners, ud_edges and slice_sorted % 24.
     """
 
     def __init__(self, cc=None):
         """
-        Create cube on coordinate level from Id-cube of from CubieCube
+        Create cube on the coordinate level from the identity cube of from a CubieCube
         :param cc: The CubieCube
         """
         if cc is None:
@@ -32,9 +32,9 @@ class CoordCube:
             self.slice_sorted = SOLVED  # Position of FR, FL, BL, BR edges. Valid in phase 1 (<11880) and phase 2 (<24)
             # The phase 1 slice coordinate is given by slice_sorted // 24
 
-            self.u_edges = 1656  # Valid in phase 1 (<11880) and phase 2 (<1680). 1656 is the index of solved u_edges.
-            self.d_edges = SOLVED  # Valid in phase 1 (<11880) and phase 2 (<1680)
-            self.corners = SOLVED  # corner permutation. Valid in phase1 and phase2
+            self.u_edges = 1656  # Valid in both phase 1 (<11880) and phase 2 (<1680). 1656 is the index of solved u_edges.
+            self.d_edges = SOLVED  # Valid in phase 1 (<11880) and phase 2 (<1680).
+            self.corners = SOLVED  # corner permutation. Valid in phases 1 and 2.
             self.ud_edges = SOLVED  # permutation of the ud-edges. Valid only in phase 2
         else:
             self.twist = cc.get_twist()
@@ -48,11 +48,11 @@ class CoordCube:
             else:
                 self.ud_edges = -1  # invalid
 
-            # symmetry reduced flipslice coordinate used in phase 1
+            # symmetry-reduced flipslice coordinate used in phase 1
             self.flipslice_classidx = sy.flipslice_classidx[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
             self.flipslice_sym = sy.flipslice_sym[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
             self.flipslice_rep = sy.flipslice_rep[self.flipslice_classidx]
-            # symmetry reduced corner permutation coordinate used in phase 2
+            # symmetry-reduced corner permutation coordinate used in phase 2
             self.corner_classidx = sy.corner_classidx[self.corners]
             self.corner_sym = sy.corner_sym[self.corners]
             self.corner_rep = sy.corner_rep[self.corner_classidx]
@@ -67,16 +67,16 @@ class CoordCube:
 
     def phase1_move(self, m):
         """
-        Update phase 1 coordinates when move is applied.
+        Update phase 1 coordinates when a move is applied.
         :param m: The move
         """
         self.twist = mv.twist_move[N_MOVE * self.twist + m]
         self.flip = mv.flip_move[N_MOVE * self.flip + m]
         self.slice_sorted = mv.slice_sorted_move[N_MOVE * self.slice_sorted + m]
-        # optional:
-        self.u_edges = mv.u_edges_move[N_MOVE * self.u_edges + m]  # u_edges and d_edges retrieve ud_edges easily
-        self.d_edges = mv.d_edges_move[N_MOVE * self.d_edges + m]  # if phase 1 is finished and phase 2 starts
-        self.corners = mv.corners_move[N_MOVE * self.corners + m]  # Is needed only in phase 2
+        # Optional:
+        self.u_edges = mv.u_edges_move[N_MOVE * self.u_edges + m]  # u_edges and d_edges allow efficient reconstruction of ud_edges.
+        self.d_edges = mv.d_edges_move[N_MOVE * self.d_edges + m]  # They are needed if phase 1 is finished and phase 2 starts.
+        self.corners = mv.corners_move[N_MOVE * self.corners + m]  # Needed only in phase 2
 
         self.flipslice_classidx = sy.flipslice_classidx[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
         self.flipslice_sym = sy.flipslice_sym[N_FLIP * (self.slice_sorted // N_PERM_4) + self.flip]
@@ -88,7 +88,7 @@ class CoordCube:
 
     def phase2_move(self, m):
         """
-        Update phase 2 coordinates when move is applied.
+        Update phase 2 coordinates when a move is applied.
         :param m: The move
         """
         self.slice_sorted = mv.slice_sorted_move[N_MOVE * self.slice_sorted + m]
@@ -97,7 +97,8 @@ class CoordCube:
 
     def get_depth_phase1(self):
         """
-        Compute the distance to the cube subgroup H where flip=slice=twist=0
+        Compute the distance to the cube subgroup H, defined by
+        flip = slice = twist = 0.
         :return: The distance to H
         """
         slice_ = self.slice_sorted // N_PERM_4
@@ -132,11 +133,11 @@ class CoordCube:
     @staticmethod
     def get_depth_phase2(corners, ud_edges):
         """
-        Get distance to subgroup where only the UD-slice edges may be permuted in their slice (only 24/2 = 12 possible
-        ways due to overall even parity). This is a lower bound for the number of moves to solve phase 2.
+       Compute the distance to subgroup where only the UD-slice edges may be permuted in their slice (only 24/2 = 12 possible
+        ways because of the overall even parity). This is a lower bound for the number of moves to solve phase 2.
         :param corners: Corners coordinate
-        :param ud_edges: Coordinate of the 8 edges of U and D face.
-        :return:
+        :param ud_edges: Coordinate of the eight U- and D-face edges.
+        :return: Lower bound on the number of phase 2 moves.
         """
         classidx = sy.corner_classidx[corners]
         sym = sy.corner_sym[corners]
@@ -165,7 +166,7 @@ class CoordCube:
 
 
 def create_phase2_edgemerge_table():
-    """phase2_edgemerge retrieves the initial phase 2 ud_edges coordinate from the u_edges and d_edges coordinates."""
+    """The phase2_edgemerge table retrieves the initial phase 2 ud_edges coordinate from the u_edges and d_edges coordinates."""
     fname = "phase2_edgemerge"
     global u_edges_plus_d_edges_to_ud_edges
     c_u = cb.CubieCube()
@@ -185,13 +186,13 @@ def create_phase2_edgemerge_table():
                 c_d.set_d_edges(j * N_PERM_4)
                 invalid = False
                 for e in edge_ud:
-                    c_ud.ep[e] = -1  # invalidate edges
+                    c_ud.ep[e] = -1  # Invalidate edge positions.
                     if c_u.ep[e] in edge_u:
                         c_ud.ep[e] = c_u.ep[e]
                     if c_d.ep[e] in edge_d:
                         c_ud.ep[e] = c_d.ep[e]
                     if c_ud.ep[e] == -1:
-                        invalid = True  # edge collision
+                        invalid = True  # Edge collision.
                         break
                 if not invalid:
                     for k in range(N_PERM_4):
@@ -219,5 +220,5 @@ def create_phase2_edgemerge_table():
 
 ########################################################################################################################
 
-
+# Initialize the phase 2 edge merge table.
 create_phase2_edgemerge_table()
