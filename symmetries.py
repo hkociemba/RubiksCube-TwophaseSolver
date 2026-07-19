@@ -1,4 +1,4 @@
-# #################### Symmetry related functions. Symmetry considerations increase the performance of the solver.######
+# #################### Symmetry-related functions. Symmetry reductions improve the performance of the solver. ##########
 import os
 from os import path
 import array as ar
@@ -45,7 +45,7 @@ basicSymCube[BS.MIRR_LR2] = cb.CubieCube(cpMIRR_LR2, coMIRR_LR2, epMIRR_LR2, eoM
 
 # ######################################## Fill SymCube list ###########################################################
 
-# 48 CubieCubes will represent the 48 cube symmetries
+# The 48 CubieCube objects representing the cube symmetries.
 symCube = []
 cc = cb.CubieCube()  # Identity cube
 idx = 0
@@ -63,7 +63,7 @@ for urf3 in range(3):
 
 # ########################################## Fill the inv_idx array ####################################################
 
-# Indices for the inverse symmetries: SymCube[inv_idx[idx]] == SymCube[idx]^(-1)
+# Indices of the inverse symmetries:: SymCube[inv_idx[idx]] == SymCube[idx]^(-1)
 inv_idx = ar.array('B', [0] * N_SYM)
 for j in range(N_SYM):
     for i in range(N_SYM):
@@ -104,7 +104,7 @@ if not os.path.exists(FOLDER):
 # ###### Generate the phase 1 table for the conjugation of the twist t by a symmetry s. twist_conj[t, s] = s*t*s^-1 ####
 fname = "conj_twist"
 if not path.isfile(os.path.join(FOLDER, fname)):
-    print('On the first run, several tables will be created. This takes about 1/2 hour or longer '
+    print('On the first run, several lookup tables will be created. This takes about 1/2 hour or longer '
           '(depending on the hardware).')
     print('All tables are stored in ' + path.dirname(path.abspath(path.join(FOLDER, fname))))
     print()
@@ -114,7 +114,7 @@ if not path.isfile(os.path.join(FOLDER, fname)):
         cc = cb.CubieCube()
         cc.set_twist(t)
         for s in range(N_SYM_D4h):
-            ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # copy cube
+            ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # Copy the cube
             ss.corner_multiply(cc)  # s*t
             ss.corner_multiply(symCube[inv_idx[s]])  # s*t*s^-1
             twist_conj[N_SYM_D4h * t + s] = ss.get_twist()
@@ -129,7 +129,7 @@ else:
 fh.close()
 # ######################################################################################################################
 
-# #################### Generate the phase 2 table for the conjugation of the URtoDB coordinate by a symmetrie ##########
+# #################### Generate the phase 2 table for the conjugation of the URtoDB coordinate by a symmetry ##########
 fname = "conj_ud_edges"
 if not path.isfile(path.join(FOLDER, fname)):
     print("creating " + fname + " table...")
@@ -142,7 +142,7 @@ if not path.isfile(path.join(FOLDER, fname)):
         cc = cb.CubieCube()
         cc.set_ud_edges(t)
         for s in range(N_SYM_D4h):
-            ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # copy cube
+            ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # Copy the cube
             ss.edge_multiply(cc)  # s*t
             ss.edge_multiply(symCube[inv_idx[s]])  # s*t*s^-1
             ud_edges_conj[N_SYM_D4h * t + s] = ss.get_ud_edges()
@@ -157,16 +157,16 @@ else:
 fh.close()
 # ######################################################################################################################
 
-# ############## Generate the tables to handle the symmetry reduced flip-slice coordinate in  phase 1 ##################
+# ############## Generate the tables to handle the symmetry-reduced flip-slice coordinate in  phase 1 ##################
 fname1 = "fs_classidx"
 fname2 = "fs_sym"
 fname3 = "fs_rep"
 if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER, fname2)) and path.isfile(
         path.join(FOLDER, fname3))):
-    print("creating " + "flipslice sym-tables...")
-    flipslice_classidx = ar.array('H', [INVALID] * (N_FLIP * N_SLICE))  # idx -> classidx
-    flipslice_sym = ar.array('B', [0] * (N_FLIP * N_SLICE))  # idx -> symmetry
-    flipslice_rep = ar.array(uint32, [0] * N_FLIPSLICE_CLASS)  # classidx -> idx of representant
+    print("creating " + "flipslice symmetry tables...")
+    flipslice_classidx = ar.array('H', [INVALID] * (N_FLIP * N_SLICE))  # Index -> classidx
+    flipslice_sym = ar.array('B', [0] * (N_FLIP * N_SLICE))  # Index -> symmetry
+    flipslice_rep = ar.array(uint32, [0] * N_FLIPSLICE_CLASS)  # Class index -> idx of the representative.
 
     classidx = 0
     cc = cb.CubieCube()
@@ -186,9 +186,9 @@ if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER,
                 flipslice_rep[classidx] = idx
             else:
                 continue
-            for s in range(N_SYM_D4h):  # conjugate representant by all 16 symmetries
+            for s in range(N_SYM_D4h):  # Conjugate the representative by all 16 symmetries
                 ss = cb.CubieCube(symCube[inv_idx[s]].cp, symCube[inv_idx[s]].co, symCube[inv_idx[s]].ep,
-                                  symCube[inv_idx[s]].eo)  # copy cube
+                                  symCube[inv_idx[s]].eo)  # Copy the cube
                 ss.edge_multiply(cc)
                 ss.edge_multiply(symCube[s])  # s^-1*cc*s
                 idx_new = N_FLIP * ss.get_slice() + ss.get_flip()
@@ -208,7 +208,7 @@ if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER,
     fh.close()
 
 else:
-    print("loading " + "flipslice sym-tables...")
+    print("loading " + "flipslice symmmetry tables...")
 
     fh = open(path.join(FOLDER, fname1), 'rb')
     flipslice_classidx = ar.array('H')
@@ -224,16 +224,16 @@ else:
     fh.close()
 ########################################################################################################################
 
-# ############ Generate the tables to handle the symmetry reduced corner permutation coordinate in phase 2 #############
+# ############ Generate the tables to handle the symmetry-reduced corner permutation coordinate in phase 2 #############
 fname1 = "co_classidx"
 fname2 = "co_sym"
 fname3 = "co_rep"
 if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER, fname2)) and path.isfile(
         path.join(FOLDER, fname3))):
-    print("creating " + "corner sym-tables...")
-    corner_classidx = ar.array('H', [INVALID] * N_CORNERS)  # idx -> classidx
-    corner_sym = ar.array('B', [0] * N_CORNERS)  # idx -> symmetry
-    corner_rep = ar.array('H', [0] * N_CORNERS_CLASS)  # classidx -> idx of representant
+    print("creating " + "corner symmetry tables...")
+    corner_classidx = ar.array('H', [INVALID] * N_CORNERS)  # Index -> class index
+    corner_sym = ar.array('B', [0] * N_CORNERS)  # Index -> symmetry
+    corner_rep = ar.array('H', [0] * N_CORNERS_CLASS)  # Class index -> index of the representative.
 
     classidx = 0
     cc = cb.CubieCube()
@@ -248,9 +248,9 @@ if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER,
             corner_rep[classidx] = cp
         else:
             continue
-        for s in range(N_SYM_D4h):  # conjugate representant by all 16 symmetries
+        for s in range(N_SYM_D4h):  # Conjugate the representative by all 16 symmetries
             ss = cb.CubieCube(symCube[inv_idx[s]].cp, symCube[inv_idx[s]].co, symCube[inv_idx[s]].ep,
-                              symCube[inv_idx[s]].eo)  # copy cube
+                              symCube[inv_idx[s]].eo)  # Copy the cube
             ss.corner_multiply(cc)
             ss.corner_multiply(symCube[s])  # s^-1*cc*s
             cp_new = ss.get_corners()
