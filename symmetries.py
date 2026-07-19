@@ -45,7 +45,7 @@ basicSymCube[BS.MIRR_LR2] = cb.CubieCube(cpMIRR_LR2, coMIRR_LR2, epMIRR_LR2, eoM
 
 # ######################################## Fill SymCube list ###########################################################
 
-# The 48 CubieCube objects representing the cube symmetries.
+# The 48 CubieCube objects that represent the cube symmetries.
 symCube = []
 cc = cb.CubieCube()  # Identity cube
 idx = 0
@@ -63,7 +63,7 @@ for urf3 in range(3):
 
 # ########################################## Fill the inv_idx array ####################################################
 
-# Indices of the inverse symmetries:: SymCube[inv_idx[idx]] == SymCube[idx]^(-1)
+# Indices of the inverse symmetries: SymCube[inv_idx[idx]] == SymCube[idx]^(-1)
 inv_idx = ar.array('B', [0] * N_SYM)
 for j in range(N_SYM):
     for i in range(N_SYM):
@@ -90,7 +90,7 @@ for i in range(N_SYM):
 conj_move = ar.array('H', [0] * (N_MOVE * N_SYM))
 for s in range(N_SYM):
     for m in Mv:
-        ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # copy cube
+        ss = cb.CubieCube(symCube[s].cp, symCube[s].co, symCube[s].ep, symCube[s].eo)  # Copy the cube
         ss.multiply(cb.moveCube[m])  # s*m
         ss.multiply(symCube[inv_idx[s]])  # s*m*s^-1
         for m2 in Mv:
@@ -163,10 +163,10 @@ fname2 = "fs_sym"
 fname3 = "fs_rep"
 if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER, fname2)) and path.isfile(
         path.join(FOLDER, fname3))):
-    print("creating " + "flipslice symmetry tables...")
+    print("creating " + "flip-slice symmetry tables...")
     flipslice_classidx = ar.array('H', [INVALID] * (N_FLIP * N_SLICE))  # Index -> classidx
     flipslice_sym = ar.array('B', [0] * (N_FLIP * N_SLICE))  # Index -> symmetry
-    flipslice_rep = ar.array(uint32, [0] * N_FLIPSLICE_CLASS)  # Class index -> idx of the representative.
+    flipslice_rep = ar.array(uint32, [0] * N_FLIPSLICE_CLASS)  # Class index -> representative index.
 
     classidx = 0
     cc = cb.CubieCube()
@@ -208,7 +208,7 @@ if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER,
     fh.close()
 
 else:
-    print("loading " + "flipslice symmmetry tables...")
+    print("loading " + "flip-slice symmetry tables...")
 
     fh = open(path.join(FOLDER, fname1), 'rb')
     flipslice_classidx = ar.array('H')
@@ -270,7 +270,7 @@ if not (path.isfile(path.join(FOLDER, fname1)) and path.isfile(path.join(FOLDER,
     fh.close()
 
 else:
-    print("loading " + "corner sym-tables...")
+    print("loading " + "corner symmetry tables...")
 
     fh = open(path.join(FOLDER, fname1), 'rb')
     corner_classidx = ar.array('H')
