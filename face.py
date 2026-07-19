@@ -1,4 +1,4 @@
-# ####### The cube on the facelet level is described by positions of the colored stickers. #############################
+# ####### The cube at the facelet level is described by the positions of its colored stickers. ########################
 
 from defs import cornerFacelet, edgeFacelet, cornerColor, edgeColor
 from enums import Color, Corner, Edge
@@ -6,7 +6,7 @@ import cubie
 
 
 class FaceCube:
-    """Represent a cube on the facelet level with 54 colored facelets."""
+    """Represent a cube at the facelet level by its 54 colored facelets."""
     def __init__(self):
         self.f = []
         for i in range(9):
@@ -26,7 +26,10 @@ class FaceCube:
         return self.to_string()
 
     def from_string(self, s):
-        """Construct a facelet cube from a string. See class Facelet(IntEnum) in enums.py for string format."""
+        """Construct a facelet cube from a string.
+
+        See ``Facelet`` in ``enums.py`` for the string format.
+        """
         if len(s) < 54:
             return 'Error: Cube definition string ' + s + ' contains less than 54 facelets.'
         elif len(s) > 54:
@@ -57,7 +60,7 @@ class FaceCube:
             return 'Error: Cube definition string ' + s + ' does not contain exactly 9 facelets of each color.'
 
     def to_string(self):
-        """Give a string representation of the facelet cube."""
+        """Return a string representation of the facelet cube."""
         s = ''
         for i in range(54):
             if self.f[i] == Color.U:
@@ -75,7 +78,7 @@ class FaceCube:
         return s
 
     def to_2dstring(self):
-        """Give a 2dstring representation of a facelet cube."""
+        """Return a two-dimensional string representation of the facelet cube."""
         s = self.to_string()
         r = '   ' + s[0:3] + '\n   ' + s[3:6] + '\n   ' + s[6:9] + '\n'
         r += s[36:39] + s[18:21] + s[9:12] + s[45:48] + '\n' + s[39:42] + s[21:24] + s[12:15] + s[48:51] \
@@ -86,20 +89,20 @@ class FaceCube:
     def to_cubie_cube(self):
         """Return a cubie representation of the facelet cube."""
         cc = cubie.CubieCube()
-        cc.cp = [-1] * 8  # invalidate corner and edge permutation
-        cc.ep = [-1] * 12
+        cc.cp = [-1] * 8  # invalidate the corner permutation
+        cc.ep = [-1] * 12  # invalidate the edge permutation
         for i in Corner:
-            fac = cornerFacelet[i]  # facelets of corner  at position i
+            fac = cornerFacelet[i]  # Facelets of the corner at position i
             ori = 0
             for ori in range(3):
                 if self.f[fac[ori]] == Color.U or self.f[fac[ori]] == Color.D:
                     break
-            col1 = self.f[fac[(ori + 1) % 3]]  # colors which identify the corner at position i
+            col1 = self.f[fac[(ori + 1) % 3]]  # Colors that identify the corner at position i
             col2 = self.f[fac[(ori + 2) % 3]]
             for j in Corner:
-                col = cornerColor[j]  # colors of corner j
+                col = cornerColor[j]  # Colors of corner j
                 if col1 == col[1] and col2 == col[2]:
-                    cc.cp[i] = j  # we have corner j in corner position i
+                    cc.cp[i] = j   # Corner j is at corner position i
                     cc.co[i] = ori
                     break
 
