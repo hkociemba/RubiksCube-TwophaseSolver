@@ -11,22 +11,22 @@ import array as ar
 
 uint32 = 'I' if ar.array('I').itemsize >= 4 else 'L'  # type codes differ between architectures
 
-flipslice_twist_depth3 = ar.array(uint32)  # global variables, initialized during pruning table cration
+flipslice_twist_depth3 = ar.array(uint32)  # global variables, initialized during pruning table creation
 corners_ud_edges_depth3 = ar.array(uint32)
 cornslice_depth = None
 edgeslice_depth = None
 
-# ####################### functions to extract or set values in the pruning tables #####################################
+# ####################### Functions for extracting and setting values #####################################
 
 def get_flipslice_twist_depth3(ix):
-    """get_fst_depth3(ix) is *exactly* the number of moves % 3 to solve phase 1 of a cube with index ix"""
+    """get_fst_depth3(ix) is *exactly* the number of moves modulo 3 to solve phase 1 of a cube with index ix"""
     y = flipslice_twist_depth3[ix // 16]
     y >>= (ix % 16) * 2
     return y & 3
 
 
 def get_corners_ud_edges_depth3(ix):
-    """corners_ud_edges_depth3(ix) is *at least* the number of moves % 3 to solve phase 2 of a cube with index ix"""
+    """corners_ud_edges_depth3(ix) is *at least* the number of moves modulo 3 to solve phase 2 of a cube with index ix"""
     y = corners_ud_edges_depth3[ix // 16]
     y >>= (ix % 16) * 2
     return y & 3
@@ -58,7 +58,7 @@ def create_phase1_prun_table():
         print('This may take half an hour or even longer, depending on the hardware.')
 
         flipslice_twist_depth3 = ar.array(uint32, [0xffffffff] * (total // 16 + 1))
-        # #################### create table with the symmetries of the flipslice classes ###############################
+        # #################### Create the table of symmetries of the flip-slice classes. ###############################
         cc = cb.CubieCube()
         fs_sym = ar.array('H', [0] * defs.N_FLIPSLICE_CLASS)
         for i in range(defs.N_FLIPSLICE_CLASS):
@@ -70,7 +70,7 @@ def create_phase1_prun_table():
 
             for s in range(defs.N_SYM_D4h):
                 ss = cb.CubieCube(sy.symCube[s].cp, sy.symCube[s].co, sy.symCube[s].ep,
-                                  sy.symCube[s].eo)  # copy cube
+                                  sy.symCube[s].eo)  # Copy the cube.
                 ss.edge_multiply(cc)  # s*cc
                 ss.edge_multiply(sy.symCube[sy.inv_idx[s]])  # s*cc*s^-1
                 if ss.get_slice() == rep // defs.N_FLIP and ss.get_flip() == rep % defs.N_FLIP:
@@ -88,7 +88,7 @@ def create_phase1_prun_table():
         while done != total:
             depth3 = depth % 3
             if depth == 9:
-                # backwards search is faster for depth >= 9
+                # backward search is faster for depth >= 9
                 print('flipping to backwards search...')
                 backsearch = True
             if depth < 8:
@@ -135,7 +135,7 @@ def create_phase1_prun_table():
                                 if get_flipslice_twist_depth3(idx1) == 3:  # entry not yet filled
                                     set_flipslice_twist_depth3(idx1, (depth + 1) % 3)
                                     done += 1
-                                    # ####symmetric position has eventually more than one representation ###############
+                                    # #### A symmetric position may have more than one representation. ###############
                                     sym = fs_sym[fs1_classidx]
                                     if sym != 1:
                                         for k in range(1, 16):
@@ -180,7 +180,7 @@ def create_phase2_prun_table():
         print("creating " + fname + " table...")
 
         corners_ud_edges_depth3 = ar.array(uint32, [0xffffffff] * (total // 16))
-        # ##################### create table with the symmetries of the corners classes ################################
+        # ##################### Create the table of symmetries of the corner classes. ################################
         cc = cb.CubieCube()
         c_sym = ar.array('H', [0] * defs.N_CORNERS_CLASS)
         for i in range(defs.N_CORNERS_CLASS):
@@ -190,7 +190,7 @@ def create_phase2_prun_table():
             cc.set_corners(rep)
             for s in range(defs.N_SYM_D4h):
                 ss = cb.CubieCube(sy.symCube[s].cp, sy.symCube[s].co, sy.symCube[s].ep,
-                                  sy.symCube[s].eo)  # copy cube
+                                  sy.symCube[s].eo)  # Copy the cube.
                 ss.corner_multiply(cc)  # s*cc
                 ss.corner_multiply(sy.symCube[sy.inv_idx[s]])  # s*cc*s^-1
                 if ss.get_corners() == rep:
@@ -204,7 +204,7 @@ def create_phase2_prun_table():
         done = 1
         depth = 0
         print('depth:', depth, 'done: ' + str(done) + '/' + str(total))
-        while depth < 10:  # we fill the table only do depth 9 + 1
+        while depth < 10:  # we fill the table only to depth 9 + 1
             depth3 = depth % 3
             idx = 0
             mult = 2
@@ -241,7 +241,7 @@ def create_phase2_prun_table():
                             if get_corners_ud_edges_depth3(idx1) == 3:  # entry not yet filled
                                 set_corners_ud_edges_depth3(idx1, (depth + 1) % 3)  # depth + 1 <= 10
                                 done += 1
-                                # ######symmetric position has eventually more than one representation #############
+                                # ###### A symmetric position may have more than one representation. #############
                                 sym = c_sym[c1_classidx]
                                 if sym != 1:
                                     for k in range(1, 16):
@@ -313,8 +313,8 @@ def create_phase2_cornsliceprun_table():
         cornslice_depth.fromfile(fh, defs.N_CORNERS * defs.N_PERM_4)
     fh.close()
 
-# array distance computes the new distance from the old_distance i and the new_distance_mod3 j. ########################
-# We need this array because the pruning tables only store the distances mod 3. ########################################
+# The array distance computes the new distance from the old_distance i and the new_distance_mod3 j. ########################
+# We need this array because the pruning tables only store the distances modulo 3. ########################################
 
 
 distance = ar.array('b', [0 for i in range(60)])
