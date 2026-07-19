@@ -89,7 +89,7 @@ def create_phase1_prun_table():
             depth3 = depth % 3
             if depth == 9:
                 # backward search is faster for depth >= 9
-                print('flipping to backwards search...')
+                print('flipping to backward search...')
                 backsearch = True
             if depth < 8:
                 mult = 5  # controls the output a few lines below
@@ -149,7 +149,7 @@ def create_phase1_prun_table():
                                                     done += 1
                                     ####################################################################################
 
-                            else:  # backwards search
+                            else:  # backward search
                                 if get_flipslice_twist_depth3(idx1) == depth3:
                                     set_flipslice_twist_depth3(idx, (depth + 1) % 3)
                                     done += 1
