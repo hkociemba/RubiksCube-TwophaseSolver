@@ -1,4 +1,4 @@
-# ####### The cube on the cubie level is described by the permutation and orientations of corners and edges ############
+# ####### The cube at the cubie level is described by the permutation and orientations of corners and edges ############
 
 from defs import cornerFacelet, edgeFacelet, cornerColor, edgeColor, N_SYM
 from enums import Color, Corner as Co, Edge as Ed
@@ -50,15 +50,16 @@ CUBE_OK = True
 
 
 class CubieCube:
-    """Represent a cube on the cubie level with 8 corner cubies, 12 edge cubies and the cubie orientations.
-    
-    Is also used to represent:
+    """Represent a cube at the cubie level by the permutations and
+    orientations of its 8 corner cubies and 12 edge cubies.
+
+    Also used to represent:
     1. the 18 cube moves
-    2. the 48 symmetries of the cube.
+    2. the 48 cube symmetries
     """
     def __init__(self, cp=None, co=None, ep=None, eo=None):
         """
-        Initializes corners and edges.
+        Initialize the corner and edge permutations and orientations.
         :param cp: corner permutation
         :param co: corner orientation
         :param ep: edge permutation
@@ -144,7 +145,7 @@ class CubieCube:
             self.co[c] = c_ori[c]
 
     def edge_multiply(self, b):
-        """ Multiply this cubie cube with another cubiecube b, restricted to the edges. Does not change b."""
+        """ Multiply this cubie cube with another cubie cube b, restricted to the edges. Does not change b."""
         e_perm = [0]*12
         e_ori = [0]*12
         for e in Ed:
@@ -155,6 +156,7 @@ class CubieCube:
             self.eo[e] = e_ori[e]
 
     def multiply(self, b):
+        """Multiply this cubie cube by cubie cube ``b``."""
         self.corner_multiply(b)
         self.edge_multiply(b)
 
@@ -195,7 +197,7 @@ class CubieCube:
         return s % 2
 
     def symmetries(self):
-        """Generate a list of the symmetries and antisymmetries of the cubie cube."""
+        """Return a list of the symmetries and antisymmetries of the cubie cube."""
         from symmetries import symCube, inv_idx  # not nice here but else we have circular imports
         s = []
         d = CubieCube()
@@ -483,7 +485,7 @@ class CubieCube:
                 k -= 1
 # ###################################### end coordinates for phase 1 and 2 #############################################
 
-# ############################################ other usefull functions #################################################
+# ############################################ other useful functions #################################################
     def randomize(self):
         """Generate a random cube. The probability is the same for all possible states."""
         def set_edges(idx):
