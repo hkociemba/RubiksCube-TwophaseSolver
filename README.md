@@ -205,5 +205,5 @@ Allowing the average solution length to increase by about 0.5 moves reduces the 
 
 The chart below shows the growth in the popularity of the project over time.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=hkociemba/RubiksCube-TwophaseSolver\&type=Date)](https://star-history.com/#hkociemba/RubiksCube-TwophaseSolver&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=hkociemba/RubiksCube-TwophaseSolver\&type=Date)](https://star-history.dera.page/#hkociemba/RubiksCube-TwophaseSolver&type=Date)
 
